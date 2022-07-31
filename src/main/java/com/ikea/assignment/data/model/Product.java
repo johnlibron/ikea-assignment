@@ -3,6 +3,7 @@ package com.ikea.assignment.data.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -18,7 +19,7 @@ public class Product {
     private String name;
 
     @Column(name = "price", nullable = false)
-    private double price;
+    private BigDecimal price;
 
     @OneToMany(mappedBy="product")
     private List<Article> articles;

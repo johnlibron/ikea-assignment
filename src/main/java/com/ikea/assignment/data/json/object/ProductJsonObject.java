@@ -3,6 +3,7 @@ package com.ikea.assignment.data.json.object;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -12,7 +13,7 @@ public class ProductJsonObject {
     private String name;
 
     @JsonProperty(required = true)
-    private double price;
+    private BigDecimal price;
 
     @JsonProperty(value = "contain_articles", required = true)
     private List<ArticleJsonObject> articles;
