@@ -13,7 +13,7 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "art_id", nullable = false)
+    @Column(name = "article_id", nullable = false)
     private String articleId;
 
     @Column(name = "amount_of", nullable = false)

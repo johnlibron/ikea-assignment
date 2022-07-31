@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class Inventory {
 
     @Id
-    @Column(name = "art_id", nullable = false)
+    @Column(name = "article_id", nullable = false)
     private String articleId;
 
     @Column(name = "name", nullable = false, unique = true)
