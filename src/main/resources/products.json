@@ -1,0 +1,54 @@
+{
+  "products": [
+    {
+      "name": "Dining Chair",
+      "price": 19.99,
+      "contain_articles": [
+        {
+          "art_id": "1",
+          "amount_of": "4"
+        },
+        {
+          "art_id": "2",
+          "amount_of": "8"
+        },
+        {
+          "art_id": "3",
+          "amount_of": "1"
+        }
+      ]
+    },
+    {
+      "name": "Dining Table",
+      "price": 149.99,
+      "contain_articles": [
+        {
+          "art_id": "1",
+          "amount_of": "4"
+        },
+        {
+          "art_id": "2",
+          "amount_of": "8"
+        },
+        {
+          "art_id": "4",
+          "amount_of": "1"
+        }
+      ]
+    },
+    {
+      "name": "Sofa Bed",
+      "price": 109.59,
+      "contain_articles": [
+        {
+          "art_id": "5",
+          "amount_of": "2"
+        },
+        {
+          "art_id": "6",
+          "amount_of": "1"
+        }
+      ]
+    }
+  ]
+}
