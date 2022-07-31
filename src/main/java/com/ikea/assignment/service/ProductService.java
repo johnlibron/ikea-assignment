@@ -1,6 +1,5 @@
 package com.ikea.assignment.service;
 
-import com.ikea.assignment.controller.ProductController;
 import com.ikea.assignment.data.dao.InventoryRepository;
 import com.ikea.assignment.data.dao.ProductRepository;
 import com.ikea.assignment.data.dto.AvailableProductDto;
