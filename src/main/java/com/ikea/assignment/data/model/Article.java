@@ -13,11 +13,11 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "article_id", nullable = false)
-    private String articleId;
-
     @Column(name = "amount_of", nullable = false)
     private Long amountOf;
+
+    @Column(name = "inventory_id", nullable = false)
+    private Long inventoryId;
 
     @ManyToOne
     @JoinColumn(name="product_id", nullable=false)
@@ -25,14 +25,14 @@ public class Article {
 
     public Article() {}
 
-    public Article(String articleId, Long amountOf) {
-        this.articleId = articleId;
+    public Article(Long amountOf, Long inventoryId) {
         this.amountOf = amountOf;
+        this.inventoryId = inventoryId;
     }
 
-    public Article(String articleId, Long amountOf, Product product) {
-        this.articleId = articleId;
+    public Article(Long amountOf, Long inventoryId, Product product) {
         this.amountOf = amountOf;
+        this.inventoryId = inventoryId;
         this.product = product;
     }
 }

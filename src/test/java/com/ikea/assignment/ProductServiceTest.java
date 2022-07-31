@@ -49,9 +49,9 @@ public class ProductServiceTest {
     @Test
     public void testGetAvailableInventory() {
         List<Article> mockArticles = Arrays.asList(
-            new Article("1", 4L),
-            new Article("2", 8L),
-            new Article("3", 1L)
+            new Article(4L, 1L),
+            new Article(8L, 2L),
+            new Article(1L, 3L)
         );
         Long mockAvailableInventory = productService.getAvailableInventory(mockArticles);
         assertTrue(mockAvailableInventory > 0);
@@ -64,9 +64,9 @@ public class ProductServiceTest {
             inventoryRepository.save(inventory);
         });
         List<Article> mockArticles = Arrays.asList(
-            new Article("1", 4L),
-            new Article("2", 8L),
-            new Article("3", 1L)
+            new Article(4L, 1L),
+            new Article(8L, 2L),
+            new Article(1L, 3L)
         );
         Long mockAvailableInventory = productService.getAvailableInventory(mockArticles);
         assertEquals(0L, mockAvailableInventory);
@@ -76,9 +76,9 @@ public class ProductServiceTest {
     public void testGetAvailableInventoryWithNoInventoryFound() {
         inventoryRepository.deleteAll();
         List<Article> mockArticles = Arrays.asList(
-            new Article("1", 4L),
-            new Article("2", 8L),
-            new Article("3", 1L)
+            new Article(4L, 1L),
+            new Article(8L, 2L),
+            new Article(1L, 3L)
         );
         Long mockAvailableInventory = productService.getAvailableInventory(mockArticles);
         assertNull(mockAvailableInventory);

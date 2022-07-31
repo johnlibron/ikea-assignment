@@ -3,9 +3,9 @@ package com.ikea.assignment;
 import com.ikea.assignment.data.dao.ArticleRepository;
 import com.ikea.assignment.data.dao.InventoryRepository;
 import com.ikea.assignment.data.dao.ProductRepository;
-import com.ikea.assignment.data.dto.ArticleDto;
-import com.ikea.assignment.data.dto.InventoryDto;
-import com.ikea.assignment.data.dto.ProductDto;
+import com.ikea.assignment.data.json.object.ArticleJsonObject;
+import com.ikea.assignment.data.json.object.InventoryJsonObject;
+import com.ikea.assignment.data.json.object.ProductJsonObject;
 import com.ikea.assignment.data.model.Article;
 import com.ikea.assignment.data.model.Inventory;
 import com.ikea.assignment.data.model.Product;
@@ -59,15 +59,15 @@ public class WarehouseApplication implements CommandLineRunner {
 	@Transactional
 	void saveProducts(String filename) throws IOException {
 		Set<Article> allArticles = new HashSet<>();
-		for (ProductDto productDto : ResourceReader.getProducts(filename)) {
+		for (ProductJsonObject productJsonObject : ResourceReader.getProducts(filename)) {
 			Product product = new Product();
-			product.setName(productDto.getName());
-			product.setPrice(productDto.getPrice());
+			product.setName(productJsonObject.getName());
+			product.setPrice(productJsonObject.getPrice());
 			List<Article> articles = new ArrayList<>();
-			for (ArticleDto articleDto : productDto.getArticles()) {
+			for (ArticleJsonObject articleJsonObject : productJsonObject.getArticles()) {
 				articles.add(new Article(
-					articleDto.getArticleId(),
-					Long.parseLong(articleDto.getAmountOf()),
+					Long.parseLong(articleJsonObject.getAmountOf()),
+					Long.parseLong(articleJsonObject.getArticleId()),
 					product
 				));
 			}
@@ -80,11 +80,11 @@ public class WarehouseApplication implements CommandLineRunner {
 
 	@Transactional
 	void saveInventory(String filename) throws IOException {
-		for (InventoryDto inventoryDto : ResourceReader.getInventory(filename)) {
+		for (InventoryJsonObject inventoryJsonObject : ResourceReader.getInventory(filename)) {
 			inventoryRepository.save(new Inventory(
-				inventoryDto.getArticleId(),
-				inventoryDto.getName(),
-				Long.parseLong(inventoryDto.getStock())
+				Long.parseLong(inventoryJsonObject.getArticleId()),
+				inventoryJsonObject.getName(),
+				Long.parseLong(inventoryJsonObject.getStock())
 			));
 		}
 	}

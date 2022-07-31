@@ -5,15 +5,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.ikea.assignment.data.dto.InventoryDto;
-import com.ikea.assignment.data.dto.ProductDto;
+import com.ikea.assignment.data.json.object.InventoryJsonObject;
+import com.ikea.assignment.data.json.object.ProductJsonObject;
 import org.springframework.util.ResourceUtils;
 
 import java.io.IOException;
 import java.util.List;
 
 public class ResourceReader {
-    public static List<ProductDto> getProducts(String productsJsonFile) throws IOException {
+    public static List<ProductJsonObject> getProducts(String productsJsonFile) throws IOException {
         final JsonFactory factory = new JsonFactory();
         final JsonParser parser = factory.createParser(ResourceUtils.getFile("classpath:" + productsJsonFile));
         if (parser.nextToken() != JsonToken.START_OBJECT) {
@@ -29,7 +29,7 @@ public class ResourceReader {
         return mapper.readValue(parser, new TypeReference<>(){});
     }
 
-    public static List<InventoryDto> getInventory(String inventoryJsonFile) throws IOException {
+    public static List<InventoryJsonObject> getInventory(String inventoryJsonFile) throws IOException {
         final JsonFactory factory = new JsonFactory();
         final JsonParser parser = factory.createParser(ResourceUtils.getFile("classpath:" + inventoryJsonFile));
         if (parser.nextToken() != JsonToken.START_OBJECT) {

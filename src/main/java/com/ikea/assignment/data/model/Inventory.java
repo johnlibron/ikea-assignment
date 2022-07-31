@@ -1,6 +1,7 @@
 package com.ikea.assignment.data.model;
 
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
@@ -10,8 +11,10 @@ import javax.persistence.*;
 public class Inventory {
 
     @Id
-    @Column(name = "article_id", nullable = false)
-    private String articleId;
+    @GenericGenerator(name = "InventoryIdGenerator", strategy = "com.ikea.assignment.data.model.id.generator.InventoryIdGenerator")
+    @GeneratedValue(generator = "InventoryIdGenerator")
+    @Column(unique = true, nullable = false)
+    private Long id;
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
@@ -21,8 +24,8 @@ public class Inventory {
 
     public Inventory() {}
 
-    public Inventory(String articleId, String name, Long stock) {
-        this.articleId = articleId;
+    public Inventory(Long id, String name, Long stock) {
+        this.id = id;
         this.name = name;
         this.stock = stock;
     }

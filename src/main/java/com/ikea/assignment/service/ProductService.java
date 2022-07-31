@@ -20,7 +20,7 @@ import java.util.Optional;
 @Service
 public class ProductService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
     private static final String INVENTORY_UPDATED_LOG = "Inventory: {} was updated";
 
@@ -50,7 +50,7 @@ public class ProductService {
         long minQuantity = 0;
         for (Article article : articles) {
             Optional<Long> optionalStock = inventoryList.stream()
-                    .filter(e -> e.getArticleId().equals(article.getArticleId()))
+                    .filter(e -> e.getId().equals(article.getInventoryId()))
                     .findFirst().map(Inventory::getStock);
             if (optionalStock.isEmpty()) {
                 return null;
@@ -76,7 +76,7 @@ public class ProductService {
     @Transactional
     public void purchaseProduct(Product product) {
         for (Article article : product.getArticles()) {
-            Optional<Inventory> optionalInventory = inventoryRepository.findById(article.getArticleId());
+            Optional<Inventory> optionalInventory = inventoryRepository.findById(article.getInventoryId());
             optionalInventory.ifPresent(inventory -> {
                 inventory.setStock(inventory.getStock() - article.getAmountOf());
                 inventoryRepository.save(inventory);
