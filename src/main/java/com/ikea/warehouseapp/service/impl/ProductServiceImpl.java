@@ -10,6 +10,9 @@ import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
 import com.ikea.warehouseapp.data.model.Article;
 import com.ikea.warehouseapp.data.model.Inventory;
 import com.ikea.warehouseapp.data.model.Product;
+import com.ikea.warehouseapp.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -22,7 +25,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductServiceImpl {
+@RequiredArgsConstructor
+public class ProductServiceImpl implements ProductService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
@@ -34,13 +38,7 @@ public class ProductServiceImpl {
 
     private final InventoryRepository inventoryRepository;
 
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ArticleRepository articleRepository, InventoryRepository inventoryRepository) {
-        this.productRepository = productRepository;
-        this.articleRepository = articleRepository;
-        this.inventoryRepository = inventoryRepository;
-    }
-
+    @Override
     public List<AvailableProductDto> getAvailableProducts() {
         List<AvailableProductDto> availableProducts = new ArrayList<>();
         productRepository.findAll().forEach(product -> {
@@ -52,6 +50,7 @@ public class ProductServiceImpl {
         return availableProducts;
     }
 
+    @Override
     public Long getAvailableInventory(List<Article> articles) {
         List<Inventory> inventoryList = inventoryRepository.findAll();
         long minQuantity = 0;
@@ -76,22 +75,28 @@ public class ProductServiceImpl {
         return minQuantity;
     }
 
+    @Override
     public Optional<Product> getProductByName(String name) {
         return productRepository.findByName(name);
     }
 
+
     @Transactional
+    @Override
     public void purchaseProduct(Product product) {
+        List<Integer> inventoryIds = new ArrayList<>();
+        List<Inventory> inventories = new ArrayList<>();
         for (Article article : product.getArticles()) {
             Optional<Inventory> optionalInventory = inventoryRepository.findById(article.getInventoryId());
             optionalInventory.ifPresent(inventory -> {
                 inventory.setStock(inventory.getStock() - article.getAmountOf());
                 inventoryRepository.save(inventory);
-                logger.info(INVENTORY_UPDATED_LOG, inventory);
             });
         }
+        logger.info(INVENTORY_UPDATED_LOG, inventoryIds);
     }
 
+    @Override
     public List<Article> getProductArticles(ProductIncomingDto productIncomingDto) {
         List<Article> articles = new ArrayList<>();
         if (productIncomingDto.getArticles().size() > 0) {
@@ -104,16 +109,18 @@ public class ProductServiceImpl {
                     return null;
                 }
                 articles.add(new Article(
-                    articleDto.getAmountOf(),
-                    optionalInventory.get().getId(),
-                    product
+                        articleDto.getAmountOf(),
+                        optionalInventory.get().getId(),
+                        product
                 ));
             }
         }
         return articles;
     }
 
+
     @Transactional
+    @Override
     public ProductDto addProduct(ProductIncomingDto productIncomingDto) {
         Product product = new Product();
         BeanUtils.copyProperties(productIncomingDto, product);

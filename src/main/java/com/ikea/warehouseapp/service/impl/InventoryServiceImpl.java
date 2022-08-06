@@ -4,6 +4,9 @@ import com.ikea.warehouseapp.data.dao.InventoryRepository;
 import com.ikea.warehouseapp.data.dto.InventoryDto;
 import com.ikea.warehouseapp.data.dto.InventoryIncomingDto;
 import com.ikea.warehouseapp.data.model.Inventory;
+import com.ikea.warehouseapp.service.InventoryService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -14,7 +17,8 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
-public class InventoryServiceImpl {
+@RequiredArgsConstructor
+public class InventoryServiceImpl implements InventoryService {
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
@@ -22,12 +26,8 @@ public class InventoryServiceImpl {
 
     private final InventoryRepository inventoryRepository;
 
-    @Autowired
-    public InventoryServiceImpl(InventoryRepository inventoryRepository) {
-        this.inventoryRepository = inventoryRepository;
-    }
-
     @Transactional
+    @Override
     public InventoryDto addInventory(InventoryIncomingDto inventoryIncomingDto) {
         Inventory inventory = new Inventory();
         BeanUtils.copyProperties(inventoryIncomingDto, inventory);
