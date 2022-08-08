@@ -24,7 +24,8 @@ public class FileReaderUtils {
             throw new IOException("expected 'products' key in JSON object");
         }
         parser.nextToken();
-
+        // use bean for this
+        // ObjectMapper
         final JsonMapper mapper = JsonMapper.builder(factory).build();
         return mapper.readValue(parser, new TypeReference<>(){});
     }

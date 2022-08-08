@@ -80,12 +80,14 @@ public class WarehouseApplication implements CommandLineRunner {
 
 	@Transactional
 	void saveInventory(String filename) throws IOException {
+		List<Inventory> inventoryList = new ArrayList<>();
 		for (InventoryJsonObject inventoryJsonObject : FileReaderUtils.getInventory(filename)) {
-			inventoryRepository.save(new Inventory(
-				Long.parseLong(inventoryJsonObject.getArticleId()),
-				inventoryJsonObject.getName(),
-				Long.parseLong(inventoryJsonObject.getStock())
+			inventoryList.add(new Inventory(
+					Long.parseLong(inventoryJsonObject.getArticleId()),
+					inventoryJsonObject.getName(),
+					Long.parseLong(inventoryJsonObject.getStock())
 			));
 		}
+		inventoryRepository.saveAll(inventoryList);
 	}
 }

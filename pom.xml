@@ -15,7 +15,7 @@
 	<description>IKEA Code Assignment</description>
 	<properties>
 		<java.version>11</java.version>
-		<junit.jupiter.version>5.8.2</junit.jupiter.version>
+		<junit.jupiter.version>5.9.0</junit.jupiter.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -53,6 +53,16 @@
 			<artifactId>junit-jupiter-engine</artifactId>
 			<version>${junit.jupiter.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>1.5.2.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.modelmapper</groupId>
+			<artifactId>modelmapper</artifactId>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
