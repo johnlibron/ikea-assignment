@@ -104,11 +104,11 @@ public class ProductServiceImpl implements ProductService {
                 if (optionalInventory.isEmpty()) {
                     return null;
                 }
-                articles.add(new Article(
-                        articleDto.getAmountOf(),
-                        optionalInventory.get().getId(),
-                        product
-                ));
+//                articles.add(new Article(
+//                        articleDto.getAmountOf(),
+//                        optionalInventory.get().getId(),
+//                        product
+//                ));
             }
         }
         return articles;

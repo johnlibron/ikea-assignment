@@ -1,19 +1,30 @@
 package com.ikea.warehouseapp.data.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 @Data
-@Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity(name = "Inventory")
 @Table(name = "inventory")
 public class Inventory {
 
     @Id
-    @GenericGenerator(name = "InventoryIdGenerator", strategy = "com.ikea.assignment.data.model.id.generator.InventoryIdGenerator")
-    @GeneratedValue(generator = "InventoryIdGenerator")
-    @Column(unique = true, nullable = false)
+    @SequenceGenerator(name = "inventory_sequence", sequenceName = "inventory_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "inventory_sequence")
+    @Column(name = "id", updatable = false)
     private Long id;
 
     @Column(name = "name", nullable = false, unique = true)
@@ -21,12 +32,4 @@ public class Inventory {
 
     @Column(name = "stock", nullable = false)
     private Long stock;
-
-    public Inventory() {}
-
-    public Inventory(Long id, String name, Long stock) {
-        this.id = id;
-        this.name = name;
-        this.stock = stock;
-    }
 }

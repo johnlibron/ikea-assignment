@@ -43,17 +43,17 @@ public class WarehouseApplication implements CommandLineRunner {
 	}
 
 	public static void main(String[] args) {
-		if (args.length == 2) {
-			productsJsonFile = args[0];
-			inventoryJsonFile = args[1];
-		}
+//		if (args.length == 2) {
+//			productsJsonFile = args[0];
+//			inventoryJsonFile = args[1];
+//		}
 		SpringApplication.run(WarehouseApplication.class, args);
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-		saveProducts(productsJsonFile);
-		saveInventory(inventoryJsonFile);
+//		saveProducts(productsJsonFile);
+//		saveInventory(inventoryJsonFile);
 	}
 
 	@Transactional
@@ -65,11 +65,11 @@ public class WarehouseApplication implements CommandLineRunner {
 			product.setPrice(productJsonObject.getPrice());
 			List<Article> articles = new ArrayList<>();
 			for (ArticleJsonObject articleJsonObject : productJsonObject.getArticles()) {
-				articles.add(new Article(
-					Long.parseLong(articleJsonObject.getAmountOf()),
-					Long.parseLong(articleJsonObject.getArticleId()),
-					product
-				));
+//				articles.add(new Article(
+//					Long.parseLong(articleJsonObject.getAmountOf()),
+//					Long.parseLong(articleJsonObject.getArticleId()),
+//					product
+//				));
 			}
 			allArticles.addAll(articles);
 			product.setArticles(articles);
