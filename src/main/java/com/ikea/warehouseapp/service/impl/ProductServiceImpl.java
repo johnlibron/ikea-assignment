@@ -13,10 +13,7 @@ import com.ikea.warehouseapp.data.model.Product;
 import com.ikea.warehouseapp.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -24,11 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     private static final String INVENTORY_UPDATED_LOG = "Inventory: {} was updated";
 
@@ -93,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
                 inventoryRepository.save(inventory);
             });
         }
-        logger.info(INVENTORY_UPDATED_LOG, inventoryIds);
+        log.info(INVENTORY_UPDATED_LOG, inventoryIds);
     }
 
     @Override
@@ -131,7 +127,7 @@ public class ProductServiceImpl implements ProductService {
             articles.add(article);
         }
         product.setArticles(articles);
-        logger.info("product: " + product);
+        log.info("product: " + product);
         return null;
     }
 }
