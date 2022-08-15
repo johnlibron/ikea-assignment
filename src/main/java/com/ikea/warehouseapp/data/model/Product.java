@@ -1,32 +1,37 @@
 package com.ikea.warehouseapp.data.model;
 
+import com.ikea.warehouseapp.data.dto.ArticleDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "Product")
-@Table(name = "product")
+@Table(name = "product", schema = "public")
 public class Product {
 
     @Id
-    @SequenceGenerator(name = "product_sequence", sequenceName = "product_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_sequence")
+    @SequenceGenerator(name = "product_id_seq", sequenceName = "product_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_id_seq")
     @Column(name = "id", updatable = false)
     private Long id;
 
@@ -36,6 +41,7 @@ public class Product {
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
-    @OneToMany(mappedBy="product")
-    private List<Article> articles;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "product_articles", joinColumns = @JoinColumn(name = "product_id"))
+    private Set<ArticleDto> articles = new HashSet<>();
 }
