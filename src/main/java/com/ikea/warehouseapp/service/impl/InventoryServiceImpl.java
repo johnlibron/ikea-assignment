@@ -5,12 +5,14 @@ import com.ikea.warehouseapp.data.dto.InventoryDto;
 import com.ikea.warehouseapp.data.dto.InventoryIncomingDto;
 import com.ikea.warehouseapp.data.model.Inventory;
 import com.ikea.warehouseapp.service.InventoryService;
+import com.ikea.warehouseapp.service.JsonParserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
@@ -22,18 +24,32 @@ public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
 
+    private final JsonParserService jsonParserService;
+
     @Transactional
     @Override
     public InventoryDto addInventory(InventoryIncomingDto inventoryIncomingDto) {
         Inventory inventory = new Inventory();
-        BeanUtils.copyProperties(inventoryIncomingDto, inventory);
-        Optional<Inventory> optionalInventory = inventoryRepository.findByName(inventory.getName());
-        if (optionalInventory.isEmpty()) {
-            return null;
+        try {
+            BeanUtils.copyProperties(inventoryIncomingDto, inventory);
+            Optional<Inventory> optionalInventory = inventoryRepository.findByName(inventory.getName());
+            if (optionalInventory.isPresent()) {
+                return null;
+            }
+            inventory = inventoryRepository.save(inventory);
+        } catch(Exception e) {
+            System.out.println(e.toString());
         }
-        inventory = inventoryRepository.save(inventory);
         InventoryDto inventoryDto = new InventoryDto();
         BeanUtils.copyProperties(inventory, inventoryDto);
         return inventoryDto;
+    }
+
+    @Transactional
+    @Override
+    public void importInventory(String pathname) throws IOException {
+        // TODO - Add batch insert support, check deadlock scenario, and add logs
+        // TODO - Check duplicate inventories (article id, name)
+		inventoryRepository.saveAll(jsonParserService.getInventory(pathname));
     }
 }

@@ -1,8 +1,8 @@
 package com.ikea.warehouseapp;
 
 import com.ikea.warehouseapp.data.dao.InventoryRepository;
+import com.ikea.warehouseapp.data.dto.ArticleDto;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
-import com.ikea.warehouseapp.data.model.Article;
 import com.ikea.warehouseapp.data.model.Product;
 import com.ikea.warehouseapp.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,10 +49,10 @@ public class ProductServiceTest {
 
     @Test
     public void testGetAvailableInventory() {
-        List<Article> mockArticles = Arrays.asList(
-            new Article(4L, 1L),
-            new Article(8L, 2L),
-            new Article(1L, 3L)
+        Set<ArticleDto> mockArticles = Set.of(
+            new ArticleDto("4", 1L),
+            new ArticleDto("8", 2L),
+            new ArticleDto("1", 3L)
         );
         Long mockAvailableInventory = productService.getAvailableInventory(mockArticles);
         assertTrue(mockAvailableInventory > 0);
@@ -63,10 +64,10 @@ public class ProductServiceTest {
             inventory.setStock(0L);
             inventoryRepository.save(inventory);
         });
-        List<Article> mockArticles = Arrays.asList(
-            new Article(4L, 1L),
-            new Article(8L, 2L),
-            new Article(1L, 3L)
+        Set<ArticleDto> mockArticles = Set.of(
+            new ArticleDto("4", 1L),
+            new ArticleDto("8", 2L),
+            new ArticleDto("1", 3L)
         );
         Long mockAvailableInventory = productService.getAvailableInventory(mockArticles);
         assertEquals(0L, mockAvailableInventory);
@@ -75,10 +76,10 @@ public class ProductServiceTest {
     @Test
     public void testGetAvailableInventoryWithNoInventoryFound() {
         inventoryRepository.deleteAll();
-        List<Article> mockArticles = Arrays.asList(
-            new Article(4L, 1L),
-            new Article(8L, 2L),
-            new Article(1L, 3L)
+        Set<ArticleDto> mockArticles = Set.of(
+            new ArticleDto("4", 1L),
+            new ArticleDto("8", 2L),
+            new ArticleDto("1", 3L)
         );
         Long mockAvailableInventory = productService.getAvailableInventory(mockArticles);
         assertNull(mockAvailableInventory);

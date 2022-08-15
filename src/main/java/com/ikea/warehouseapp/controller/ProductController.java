@@ -1,7 +1,6 @@
 package com.ikea.warehouseapp.controller;
 
 import com.ikea.warehouseapp.data.dto.*;
-import com.ikea.warehouseapp.data.model.Article;
 import com.ikea.warehouseapp.data.model.Product;
 import com.ikea.warehouseapp.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,9 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +51,7 @@ public class ProductController {
     })
     @GetMapping("available")
     public ResponseEntity<List<AvailableProductDto>> getAvailableProducts() {
+        // TODO - Add fetch big data support, add pagination
         return ResponseEntity.status(HttpStatus.OK).body(productService.getAvailableProducts());
     }
 
@@ -63,6 +65,7 @@ public class ProductController {
     })
     @PutMapping(value = "{productName}")
     public ResponseEntity<AvailableProductDto> purchaseProduct(@PathVariable("productName") String name) {
+        // TODO - Change the path variable to ID
         final Optional<Product> optionalProduct = productService.getProductByName(name);
         if (optionalProduct.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -92,16 +95,23 @@ public class ProductController {
         if (optionalProduct.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        final List<Article> articles = productService.getProductArticles(productIncomingDto);
+        final List<ArticleDto> articles = productService.getProductArticles(productIncomingDto);
         logger.info("articles: " + articles);
         if (articles == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-//        final ProductDto addedProduct = productService.addProduct(productIncomingDto);
-//        if (addedProduct == null) {
-//            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-//        }
-//        logger.info(NEW_PRODUCT_LOG, addedProduct);
+        final ProductDto addedProduct = productService.addProduct(productIncomingDto);
+        if (addedProduct == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        logger.info(NEW_PRODUCT_LOG, addedProduct);
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
+    }
+
+    @GetMapping("import")
+    public ResponseEntity<Void> importProducts(@RequestParam("path") String path) throws IOException {
+        // TODO - Add ApiResponses, Operation, path validation
+        productService.importProducts(path);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

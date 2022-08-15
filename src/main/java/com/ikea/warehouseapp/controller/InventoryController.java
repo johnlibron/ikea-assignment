@@ -2,24 +2,27 @@ package com.ikea.warehouseapp.controller;
 
 import com.ikea.warehouseapp.data.dto.InventoryDto;
 import com.ikea.warehouseapp.data.dto.InventoryIncomingDto;
-import com.ikea.warehouseapp.service.impl.InventoryServiceImpl;
+import com.ikea.warehouseapp.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import java.io.IOException;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/inventory", produces = APPLICATION_JSON_VALUE)
 public class InventoryController {
 
@@ -27,12 +30,7 @@ public class InventoryController {
 
     private static final String NEW_INVENTORY_LOG = "New inventory was created: {}";
 
-    private final InventoryServiceImpl inventoryServiceImpl;
-
-    @Autowired
-    public InventoryController(InventoryServiceImpl inventoryService) {
-        this.inventoryServiceImpl = inventoryService;
-    }
+    private final InventoryService inventoryService;
 
     @Operation(summary = "Add new inventory")
     @ApiResponses(value = {
@@ -43,11 +41,18 @@ public class InventoryController {
     })
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<InventoryDto> addInventory(@Valid @RequestBody InventoryIncomingDto inventoryIncomingDto) {
-        final InventoryDto addedInventory = inventoryServiceImpl.addInventory(inventoryIncomingDto);
+        final InventoryDto addedInventory = inventoryService.addInventory(inventoryIncomingDto);
         if (addedInventory == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         logger.info(NEW_INVENTORY_LOG, addedInventory);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedInventory);
+    }
+
+    @PostMapping("import")
+    public ResponseEntity<Void> importInventory(@RequestParam("path") String path) throws IOException {
+        // TODO - Add ApiResponses, Operation, path validation
+        inventoryService.importInventory(path);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

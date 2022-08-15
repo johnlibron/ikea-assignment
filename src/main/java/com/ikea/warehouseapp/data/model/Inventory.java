@@ -33,6 +33,6 @@ public class Inventory {
     @Column(name = "stock", nullable = false)
     private Long stock;
 
-    @Column(name = "article_id")
+    @Column(name = "article_id", nullable = false, unique = true)
     private String articleId;
 }

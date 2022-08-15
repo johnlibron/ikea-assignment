@@ -18,6 +18,7 @@ import java.util.List;
 public class JsonParserServiceImpl implements JsonParserService {
     @Override
     public List<Inventory> getInventory(String pathname) throws IOException {
+        // TODO - Add Json token validation for inventory data structure
         JsonParser parser = null;
         try {
             final JsonFactory factory = new JsonFactory();
@@ -34,6 +35,7 @@ public class JsonParserServiceImpl implements JsonParserService {
 
     @Override
     public List<Product> getProducts(String pathname) throws IOException {
+        // TODO - Add Json token validation for products data structure
         JsonParser parser = null;
         try {
             final JsonFactory factory = new JsonFactory();
