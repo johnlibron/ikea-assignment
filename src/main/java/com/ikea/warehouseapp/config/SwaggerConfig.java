@@ -9,6 +9,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Set;
+
 @EnableWebMvc
 @EnableSwagger2
 @Configuration
@@ -20,6 +22,8 @@ public class SwaggerConfig {
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.ikea.warehouseapp.controller"))
                 .paths(PathSelectors.any())
-                .build();
+                .build()
+                .produces(Set.of("application/json"))
+                .consumes(Set.of("application/json"));
     }
 }

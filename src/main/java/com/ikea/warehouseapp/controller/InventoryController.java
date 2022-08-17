@@ -19,11 +19,9 @@ import javax.validation.Valid;
 
 import java.io.IOException;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/v1/inventory", produces = APPLICATION_JSON_VALUE)
+@RequestMapping("/api/v1/inventory")
 public class InventoryController {
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryController.class);
@@ -34,12 +32,11 @@ public class InventoryController {
 
     @Operation(summary = "Add new inventory")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "New inventory is added", content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = InventoryDto.class))
-        }),
+        @ApiResponse(responseCode = "201", description = "New inventory is added",
+            content = {@Content(schema = @Schema(implementation = InventoryDto.class))}),
         @ApiResponse(responseCode = "409", description = "Inventory already exists", content = @Content)
     })
-    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    @PostMapping
     public ResponseEntity<InventoryDto> addInventory(@Valid @RequestBody InventoryIncomingDto inventoryIncomingDto) {
         final InventoryDto addedInventory = inventoryService.addInventory(inventoryIncomingDto);
         if (addedInventory == null) {

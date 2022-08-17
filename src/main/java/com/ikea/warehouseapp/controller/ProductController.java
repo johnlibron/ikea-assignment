@@ -28,10 +28,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 @RestController
-@RequestMapping(path = {"/api/v1/products"}, produces = APPLICATION_JSON_VALUE)
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
@@ -57,13 +55,12 @@ public class ProductController {
 
     @Operation(summary = "Purchase a product and update the inventory accordingly")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product was purchased and Inventory was updated", content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = AvailableProductDto.class))
-        }),
+        @ApiResponse(responseCode = "200", description = "Product was purchased and Inventory was updated",
+            content = {@Content(schema = @Schema(implementation = AvailableProductDto.class))}),
         @ApiResponse(responseCode = "404", description = "Product/Inventory not found", content = @Content),
         @ApiResponse(responseCode = "409", description = "Insufficient inventory", content = @Content)
     })
-    @PutMapping(value = "{productName}")
+    @PutMapping("{productName}")
     public ResponseEntity<AvailableProductDto> purchaseProduct(@PathVariable("productName") String name) {
         // TODO - Change the path variable to ID
         final Optional<Product> optionalProduct = productService.getProductByName(name);
@@ -83,13 +80,12 @@ public class ProductController {
 
     @Operation(summary = "Add new product")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "New product is added", content = {
-            @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = ProductDto.class))
-        }),
+        @ApiResponse(responseCode = "201", description = "New product is added",
+            content = {@Content(schema = @Schema(implementation = ProductDto.class))}),
         @ApiResponse(responseCode = "404", description = "Inventory not found", content = @Content),
         @ApiResponse(responseCode = "409", description = "Product already exists", content = @Content)
     })
-    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    @PostMapping
     public ResponseEntity<ProductDto> addProduct(@Valid @RequestBody ProductIncomingDto productIncomingDto) {
         final Optional<Product> optionalProduct = productService.getProductByName(productIncomingDto.getName());
         if (optionalProduct.isPresent()) {
