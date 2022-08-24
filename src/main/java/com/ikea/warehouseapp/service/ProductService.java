@@ -9,13 +9,12 @@ import com.ikea.warehouseapp.data.model.Product;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface ProductService {
 
     List<AvailableProductDto> getAvailableProducts();
 
-    Long getAvailableInventory(Set<ArticleDto> articles);
+    Long getAvailableInventory(List<ArticleDto> articles);
 
     Optional<Product> getProductByName(String name);
 
@@ -26,4 +25,6 @@ public interface ProductService {
     ProductDto addProduct(ProductIncomingDto productIncomingDto);
 
     void importProducts(String pathname) throws IOException;
+
+    boolean checkExistingProducts(List<Product> products);
 }

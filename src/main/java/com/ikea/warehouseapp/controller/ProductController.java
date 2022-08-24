@@ -1,8 +1,12 @@
 package com.ikea.warehouseapp.controller;
 
-import com.ikea.warehouseapp.data.dto.*;
+import com.ikea.warehouseapp.data.dto.ArticleDto;
+import com.ikea.warehouseapp.data.dto.AvailableProductDto;
+import com.ikea.warehouseapp.data.dto.ProductDto;
+import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
 import com.ikea.warehouseapp.data.model.Product;
 import com.ikea.warehouseapp.service.ProductService;
+import com.ikea.warehouseapp.util.FileUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -104,9 +108,17 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(null);
     }
 
-    @GetMapping("import")
+    @Operation(summary = "Import products with articles")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Products with articles are imported", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Inventory not found", content = @Content),
+        @ApiResponse(responseCode = "409", description = "Product already exists", content = @Content)
+    })
+    @PostMapping("import")
     public ResponseEntity<Void> importProducts(@RequestParam("path") String path) throws IOException {
-        // TODO - Add ApiResponses, Operation, path validation
+        if (!FileUtils.isValidJsonFilePath(path)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         productService.importProducts(path);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

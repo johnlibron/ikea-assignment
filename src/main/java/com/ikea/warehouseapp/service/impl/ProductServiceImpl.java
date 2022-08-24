@@ -8,6 +8,7 @@ import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
 import com.ikea.warehouseapp.data.model.Inventory;
 import com.ikea.warehouseapp.data.model.Product;
+import com.ikea.warehouseapp.service.InventoryService;
 import com.ikea.warehouseapp.service.JsonParserService;
 import com.ikea.warehouseapp.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +19,10 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,6 +34,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     private final JsonParserService jsonParserService;
+
+    private final InventoryService inventoryService;
 
     private final InventoryRepository inventoryRepository;
 
@@ -50,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Long getAvailableInventory(Set<ArticleDto> articles) {
+    public Long getAvailableInventory(List<ArticleDto> articles) {
         List<Inventory> inventoryList = inventoryRepository.findAll();
         long minQuantity = 0;
         for (ArticleDto article : articles) {
@@ -125,7 +128,7 @@ public class ProductServiceImpl implements ProductService {
         // TODO
         Product product = new Product();
         BeanUtils.copyProperties(productIncomingDto, product);
-        Set<ArticleDto> articles = new HashSet<>();
+        List<ArticleDto> articles = new ArrayList<>();
         for (ArticleDto articleDto : productIncomingDto.getArticles()) {
             ArticleDto article = new ArticleDto();
             BeanUtils.copyProperties(articleDto, article);
@@ -139,10 +142,24 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public void importProducts(String pathname) throws IOException {
-        // TODO - Add batch insert support, check deadlock scenario, and add logs
-        // TODO - Check each articles if it exists in the inventory
-        // TODO - Check duplicate products and its articles
+        // TODO: Add batch insert support, check deadlock scenario, and add logs
         List<Product> products = jsonParserService.getProducts(pathname);
+        Set<String> articleIds = products.stream()
+                .flatMap(product -> product.getArticles().stream())
+                .map(ArticleDto::getArticleId)
+                .collect(Collectors.toSet());
+        if (checkExistingProducts(products)) {
+            // TODO: Add customized error if it has duplicate products
+        }
+        if (!inventoryService.checkExistingInventory(List.copyOf(articleIds))) {
+            // TODO: Add customized error if no existing inventory for product articles
+        }
         productRepository.saveAll(products);
+    }
+
+    @Override
+    public boolean checkExistingProducts(List<Product> products) {
+        List<String> productNames = products.stream().map(Product::getName).collect(Collectors.toList());
+        return productRepository.existsByNameIn(productNames);
     }
 }

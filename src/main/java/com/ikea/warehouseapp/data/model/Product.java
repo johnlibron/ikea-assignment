@@ -18,8 +18,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -43,5 +43,12 @@ public class Product {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "product_articles", joinColumns = @JoinColumn(name = "product_id"))
-    private Set<ArticleDto> articles = new HashSet<>();
+    private List<ArticleDto> articles = new ArrayList<>();
+
+    // TODO: Transfer this constructor to Lombok
+    public Product(String name, BigDecimal price, List<ArticleDto> articles) {
+        this.name = name;
+        this.price = price;
+        this.articles = articles;
+    }
 }

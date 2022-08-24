@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -51,5 +52,10 @@ public class InventoryServiceImpl implements InventoryService {
         // TODO - Add batch insert support, check deadlock scenario, and add logs
         // TODO - Check duplicate inventories (article id, name)
 		inventoryRepository.saveAll(jsonParserService.getInventory(pathname));
+    }
+
+    @Override
+    public boolean checkExistingInventory(List<String> articleIds) {
+        return inventoryRepository.existsByArticleIdIn(articleIds);
     }
 }

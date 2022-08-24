@@ -18,13 +18,14 @@ import java.util.List;
 public class JsonParserServiceImpl implements JsonParserService {
     @Override
     public List<Inventory> getInventory(String pathname) throws IOException {
+        // TODO - Validate Incoming Json With Json Schema
         // TODO - Add Json token validation for inventory data structure
         JsonParser parser = null;
         try {
             final JsonFactory factory = new JsonFactory();
             parser = factory.createParser(new File(pathname));
             return JsonMapperUtils.toObject(InventoryJson.class, parser).getInventory();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new IOException();
         } finally {
             if (parser != null) {
@@ -35,13 +36,14 @@ public class JsonParserServiceImpl implements JsonParserService {
 
     @Override
     public List<Product> getProducts(String pathname) throws IOException {
+        // TODO - Validate Incoming Json With Json Schema
         // TODO - Add Json token validation for products data structure
         JsonParser parser = null;
         try {
             final JsonFactory factory = new JsonFactory();
             parser = factory.createParser(new File(pathname));
             return JsonMapperUtils.toObject(ProductJson.class, parser).getProducts();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new IOException();
         } finally {
             if (parser != null) {
