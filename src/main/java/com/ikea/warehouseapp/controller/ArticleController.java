@@ -3,11 +3,7 @@ package com.ikea.warehouseapp.controller;
 import com.ikea.warehouseapp.data.dao.ArticleRepository;
 import com.ikea.warehouseapp.data.dto.ArticleDto;
 import com.ikea.warehouseapp.data.dto.ArticleIncomingDto;
-import com.ikea.warehouseapp.data.json.Articles;
-import com.ikea.warehouseapp.data.model.Article;
 import com.ikea.warehouseapp.service.InventoryService;
-import com.ikea.warehouseapp.util.FileUtils;
-import com.ikea.warehouseapp.util.JsonMapperUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,13 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/articles")
@@ -56,16 +48,5 @@ public class ArticleController {
         }
         logger.info(NEW_INVENTORY_LOG, addedInventory);
         return ResponseEntity.status(HttpStatus.CREATED).body(addedInventory);
-    }
-
-    @PostMapping("import")
-    public ResponseEntity<Void> importInventory(@RequestParam("path") String path) throws IOException {
-        // TODO - Add ApiResponses, Operation, path validation
-        File jsonFile = FileUtils.getJsonFile(path);
-        List<Article> articles = JsonMapperUtils.toObject(jsonFile, Articles.class).getArticle();
-        System.out.println("inventory = " + articles);
-//        articleRepository.saveAll(inventory);
-//        inventoryService.importInventory(path);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

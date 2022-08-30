@@ -5,14 +5,14 @@ import com.ikea.warehouseapp.data.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@Validated
+@Transactional
 @AllArgsConstructor
 public class ProductCommandService {
 

@@ -35,4 +35,11 @@ public class Article {
 
     @Column(name = "article_id", nullable = false, unique = true)
     private String articleId;
+
+    // TODO: Transfer this constructor to Lombok
+    public Article(String name, Long stock, String articleId) {
+        this.name = name;
+        this.stock = stock;
+        this.articleId = articleId;
+    }
 }

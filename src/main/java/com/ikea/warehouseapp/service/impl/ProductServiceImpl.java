@@ -2,8 +2,8 @@ package com.ikea.warehouseapp.service.impl;
 
 import com.ikea.warehouseapp.data.dao.ArticleRepository;
 import com.ikea.warehouseapp.data.dao.ProductRepository;
-import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
+import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
 import com.ikea.warehouseapp.data.model.Article;
@@ -16,11 +16,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -134,30 +132,5 @@ public class ProductServiceImpl implements ProductService {
         product.setArticles(articles);
         log.info("product: " + product);
         return null;
-    }
-
-    @Transactional
-    @Override
-    public void importProducts(String pathname) throws IOException {
-        // TODO: Add batch insert support, check deadlock scenario, and add logs
-        /*List<Product> products = jsonParserService.getProducts(pathname);
-        Set<String> articleIds = products.stream()
-                .flatMap(product -> product.getArticles().stream())
-                .map(ArticleDto::getArticleId)
-                .collect(Collectors.toSet());
-        if (checkExistingProducts(products)) {
-            // TODO: Add customized error if it has duplicate products
-        }
-        if (!inventoryService.checkExistingInventory(List.copyOf(articleIds))) {
-            // TODO: Add customized error if no existing inventory for product articles
-        }
-        productRepository.saveAll(products);*/
-    }
-
-    @Override
-    public boolean checkExistingProducts(List<Product> products) {
-        List<String> productNames = products.stream().map(Product::getName).collect(Collectors.toList());
-//        return productRepository.existsByNameIn(productNames);
-        return false;
     }
 }

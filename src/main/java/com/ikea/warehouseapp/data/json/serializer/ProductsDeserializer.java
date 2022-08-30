@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ProductListDeserializer extends JsonDeserializer<List<Product>> {
+public class ProductsDeserializer extends JsonDeserializer<List<Product>> {
 
     @Override
     public List<Product> deserialize(JsonParser parser, DeserializationContext ctx) throws IOException {
