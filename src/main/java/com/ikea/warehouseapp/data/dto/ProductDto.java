@@ -13,5 +13,5 @@ public class ProductDto {
 
     private BigDecimal price;
 
-    private List<ArticleDto> articles;
+    private List<ProductArticleDto> articles;
 }

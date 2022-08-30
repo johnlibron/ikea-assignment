@@ -1,12 +1,12 @@
 package com.ikea.warehouseapp.controller;
 
-import com.ikea.warehouseapp.data.dto.ArticleDto;
+import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
-import com.ikea.warehouseapp.data.json.object.ProductJson;
+import com.ikea.warehouseapp.data.json.Products;
 import com.ikea.warehouseapp.data.mapper.ProductMapper;
-import com.ikea.warehouseapp.data.model.Inventory;
+import com.ikea.warehouseapp.data.model.Article;
 import com.ikea.warehouseapp.data.model.Product;
 import com.ikea.warehouseapp.exception.ResourceExistsException;
 import com.ikea.warehouseapp.exception.ResourceNotFoundException;
@@ -48,7 +48,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping("/api/products")
 @AllArgsConstructor
 public class ProductController {
 
@@ -112,7 +112,7 @@ public class ProductController {
         if (optionalProduct.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-        final List<ArticleDto> articles = productService.getProductArticles(productIncomingDto);
+        final List<ProductArticleDto> articles = productService.getProductArticles(productIncomingDto);
         logger.info("articles: " + articles);
         if (articles == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -135,14 +135,14 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> importProducts(@RequestParam("path") String path) throws IOException {
         // TODO: Add batch insert support, check deadlock scenario, and add logs
         File jsonFile = FileUtils.getJsonFile(path);
-        List<Product> products = JsonMapperUtils.toObject(jsonFile, ProductJson.class).getProducts();
+        List<Product> products = JsonMapperUtils.toObject(jsonFile, Products.class).getProducts();
         List<Product> existingProducts = productQueryService.findByNameIn(getProductNames(products));
         if (!existingProducts.isEmpty()) {
             throw new ResourceExistsException("Import products " +
                     getProductNames(existingProducts) + " already exists");
         }
         List<String> articleIds = new ArrayList<>(getProductArticleIds(products));
-        List<Inventory> existingArticles = articleQueryService.findByArticleIdIn(articleIds);
+        List<Article> existingArticles = articleQueryService.findByArticleIdIn(articleIds);
         Collection<String> notExistArticleIds = CollectionUtils.removeAll(articleIds, getArticleIds(existingArticles));
         if (!notExistArticleIds.isEmpty()) {
             throw new ResourceNotFoundException("Import product article ids " + notExistArticleIds + " not exists");
@@ -157,10 +157,10 @@ public class ProductController {
 
     private Set<String> getProductArticleIds(List<Product> products) {
         return products.stream().flatMap(product -> product.getArticles().stream())
-                .map(ArticleDto::getArticleId).collect(Collectors.toSet());
+                .map(ProductArticleDto::getArticleId).collect(Collectors.toSet());
     }
 
-    private List<String> getArticleIds(List<Inventory> articles) {
-        return articles.stream().map(Inventory::getArticleId).collect(Collectors.toList());
+    private List<String> getArticleIds(List<Article> articles) {
+        return articles.stream().map(Article::getArticleId).collect(Collectors.toList());
     }
 }

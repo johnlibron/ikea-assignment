@@ -1,11 +1,10 @@
 package com.ikea.warehouseapp.service.impl;
 
-import com.ikea.warehouseapp.data.dao.InventoryRepository;
-import com.ikea.warehouseapp.data.dto.InventoryDto;
-import com.ikea.warehouseapp.data.dto.InventoryIncomingDto;
-import com.ikea.warehouseapp.data.model.Inventory;
+import com.ikea.warehouseapp.data.dao.ArticleRepository;
+import com.ikea.warehouseapp.data.dto.ArticleDto;
+import com.ikea.warehouseapp.data.dto.ArticleIncomingDto;
+import com.ikea.warehouseapp.data.model.Article;
 import com.ikea.warehouseapp.service.InventoryService;
-import com.ikea.warehouseapp.service.JsonParserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -23,27 +22,25 @@ public class InventoryServiceImpl implements InventoryService {
 
     private static final String INVENTORY_UPDATED_LOG = "Inventory: {} was updated";
 
-    private final InventoryRepository inventoryRepository;
-
-    private final JsonParserService jsonParserService;
+    private final ArticleRepository articleRepository;
 
     @Transactional
     @Override
-    public InventoryDto addInventory(InventoryIncomingDto inventoryIncomingDto) {
-        Inventory inventory = new Inventory();
+    public ArticleDto addInventory(ArticleIncomingDto articleIncomingDto) {
+        Article article = new Article();
         try {
-            BeanUtils.copyProperties(inventoryIncomingDto, inventory);
-            Optional<Inventory> optionalInventory = inventoryRepository.findByName(inventory.getName());
+            BeanUtils.copyProperties(articleIncomingDto, article);
+            Optional<Article> optionalInventory = articleRepository.findByName(article.getName());
             if (optionalInventory.isPresent()) {
                 return null;
             }
-            inventory = inventoryRepository.save(inventory);
+            article = articleRepository.save(article);
         } catch(Exception e) {
             System.out.println(e.toString());
         }
-        InventoryDto inventoryDto = new InventoryDto();
-        BeanUtils.copyProperties(inventory, inventoryDto);
-        return inventoryDto;
+        ArticleDto articleDto = new ArticleDto();
+        BeanUtils.copyProperties(article, articleDto);
+        return articleDto;
     }
 
     @Transactional
@@ -51,11 +48,11 @@ public class InventoryServiceImpl implements InventoryService {
     public void importInventory(String pathname) throws IOException {
         // TODO - Add batch insert support, check deadlock scenario, and add logs
         // TODO - Check duplicate inventories (article id, name)
-		inventoryRepository.saveAll(jsonParserService.getInventory(pathname));
+//		inventoryRepository.saveAll(jsonParserService.getInventory(pathname));
     }
 
     @Override
     public boolean checkExistingInventory(List<String> articleIds) {
-        return inventoryRepository.existsByArticleIdIn(articleIds);
+        return articleRepository.existsByArticleIdIn(articleIds);
     }
 }

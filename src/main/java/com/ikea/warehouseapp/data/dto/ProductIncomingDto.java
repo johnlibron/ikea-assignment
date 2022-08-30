@@ -17,10 +17,10 @@ public class ProductIncomingDto {
 
     @JsonProperty(required = true)
     @NotNull
-    @DecimalMin(value = "0.01", message = "Price must not be empty")
+    @DecimalMin(value = "0.01", message = "must not be empty")
     private BigDecimal price;
 
     @JsonProperty(required = true)
     @NotEmpty
-    private List<@NotNull ArticleDto> articles;
+    private List<@NotNull ProductArticleDto> articles;
 }

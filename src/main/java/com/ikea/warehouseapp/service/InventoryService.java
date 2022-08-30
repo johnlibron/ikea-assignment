@@ -1,14 +1,14 @@
 package com.ikea.warehouseapp.service;
 
-import com.ikea.warehouseapp.data.dto.InventoryDto;
-import com.ikea.warehouseapp.data.dto.InventoryIncomingDto;
+import com.ikea.warehouseapp.data.dto.ArticleDto;
+import com.ikea.warehouseapp.data.dto.ArticleIncomingDto;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface InventoryService {
 
-    InventoryDto addInventory(InventoryIncomingDto inventoryIncomingDto);
+    ArticleDto addInventory(ArticleIncomingDto articleIncomingDto);
 
     void importInventory(String pathname) throws IOException;
 

@@ -1,8 +1,9 @@
-package com.ikea.warehouseapp.data.json.object;
+package com.ikea.warehouseapp.data.json;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.ikea.warehouseapp.data.model.Inventory;
+import com.ikea.warehouseapp.data.json.serializer.InventoryListDeserializer;
+import com.ikea.warehouseapp.data.model.Article;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +15,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class InventoryJson {
+public class Articles {
 
     @JsonDeserialize(using = InventoryListDeserializer.class)
-    private List<Inventory> inventory;
+    private List<Article> article;
 }

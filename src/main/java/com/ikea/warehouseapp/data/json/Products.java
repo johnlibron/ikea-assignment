@@ -1,6 +1,7 @@
-package com.ikea.warehouseapp.data.json.object;
+package com.ikea.warehouseapp.data.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.ikea.warehouseapp.data.json.serializer.ProductListDeserializer;
 import com.ikea.warehouseapp.data.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductJson {
+public class Products {
 
     @JsonDeserialize(using = ProductListDeserializer.class)
     private List<Product> products;

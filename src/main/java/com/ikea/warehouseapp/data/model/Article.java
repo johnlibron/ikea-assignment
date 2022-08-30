@@ -17,13 +17,13 @@ import javax.persistence.Table;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "Inventory")
-@Table(name = "inventory", schema = "public")
-public class Inventory {
+@Entity(name = "Article")
+@Table(name = "article", schema = "public")
+public class Article {
 
     @Id
-    @SequenceGenerator(name = "inventory_id_seq", sequenceName = "inventory_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "inventory_id_seq")
+    @SequenceGenerator(name = "article_id_seq", sequenceName = "article_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "article_id_seq")
     @Column(name = "id", updatable = false)
     private Long id;
 

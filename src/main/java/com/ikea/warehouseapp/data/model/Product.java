@@ -1,6 +1,6 @@
 package com.ikea.warehouseapp.data.model;
 
-import com.ikea.warehouseapp.data.dto.ArticleDto;
+import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,10 +43,10 @@ public class Product {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "product_articles", joinColumns = @JoinColumn(name = "product_id"))
-    private List<ArticleDto> articles = new ArrayList<>();
+    private List<ProductArticleDto> articles = new ArrayList<>();
 
     // TODO: Transfer this constructor to Lombok
-    public Product(String name, BigDecimal price, List<ArticleDto> articles) {
+    public Product(String name, BigDecimal price, List<ProductArticleDto> articles) {
         this.name = name;
         this.price = price;
         this.articles = articles;
