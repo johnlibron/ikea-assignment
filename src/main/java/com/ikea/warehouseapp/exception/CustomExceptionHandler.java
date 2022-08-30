@@ -20,6 +20,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
-    public static final String LIST_JOIN_DELIMITER = ",";
+    public static final String LIST_JOIN_DELIMITER = ", ";
     public static final String FIELD_ERROR_SEPARATOR = ": ";
 
     @Override
@@ -36,9 +37,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
-        final String validationErrors = exception.getBindingResult().getFieldErrors().stream()
+        final List<String> validationErrors = exception.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + FIELD_ERROR_SEPARATOR + error.getDefaultMessage())
-                .collect(Collectors.joining(LIST_JOIN_DELIMITER));
+                .collect(Collectors.toList());
         return getExceptionResponseEntity(HttpStatus.BAD_REQUEST, request, validationErrors);
     }
 
@@ -70,7 +71,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return getExceptionResponseEntity(HttpStatus.METHOD_NOT_ALLOWED, request,
                 exception.getMethod() + " method is not supported. Supported " +
                         (exception.getSupportedHttpMethods().size() > 0 ? "methods are "  : "method is ") +
-                        StringUtils.join(exception.getSupportedHttpMethods(), ", "));
+                        StringUtils.join(exception.getSupportedHttpMethods(), LIST_JOIN_DELIMITER));
     }
 
     @Override
@@ -82,7 +83,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return getExceptionResponseEntity(HttpStatus.UNSUPPORTED_MEDIA_TYPE, request,
                 exception.getContentType() + " media type is not supported. Supported media " +
                         (exception.getSupportedMediaTypes().size() > 0 ? "types are "  : "type is ") +
-                        StringUtils.join(exception.getSupportedMediaTypes(), ", "));
+                        StringUtils.join(exception.getSupportedMediaTypes(), LIST_JOIN_DELIMITER));
     }
 
     @Override
@@ -95,27 +96,27 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 "No handler found for " + exception.getHttpMethod() + " " + exception.getRequestURL());
     }
 
-    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Object> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException exception, WebRequest request) {
         return getExceptionResponseEntity(HttpStatus.BAD_REQUEST, request,
                 exception.getName() + " should be of type " + exception.getRequiredType().getName());
     }
 
-    @ExceptionHandler({ConstraintViolationException.class})
+    @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolation(
             ConstraintViolationException exception,
             WebRequest request) {
-        final String validationErrors = exception.getConstraintViolations().stream()
+        final List<String> validationErrors = exception.getConstraintViolations().stream()
                 .map(violation -> {
                     String[] param = String.valueOf(violation.getPropertyPath()).split("\\.");
                     return param[param.length-1] + FIELD_ERROR_SEPARATOR + violation.getMessage();
                 })
-                .collect(Collectors.joining(LIST_JOIN_DELIMITER));
+                .collect(Collectors.toList());
         return getExceptionResponseEntity(HttpStatus.BAD_REQUEST, request, validationErrors);
     }
 
-    @ExceptionHandler({Exception.class})
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleAllExceptions(Exception exception, WebRequest request) {
         ResponseStatus responseStatus = exception.getClass().getAnnotation(ResponseStatus.class);
         final HttpStatus status = responseStatus != null ? responseStatus.value() : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -129,19 +130,28 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> getExceptionResponseEntity(
             HttpStatus status,
             WebRequest request,
-            String errorsMessage) {
+            List<String> errors) {
         final String path = ((ServletWebRequest) request).getRequest().getRequestURI();
-        final List<String> errors = List.of(errorsMessage.split(LIST_JOIN_DELIMITER));
-        log.error("errors {} for path {}", errorsMessage, path);
+        log.error("errors {} for path {}", errors, path);
         return new ResponseEntity<>(new ApiError(status, errors, getMessageForStatus(status), path), status);
+    }
+
+    private ResponseEntity<Object> getExceptionResponseEntity(
+            HttpStatus status,
+            WebRequest request,
+            String errorMessage) {
+        final String path = ((ServletWebRequest) request).getRequest().getRequestURI();
+        log.error("error {} for path {}", errorMessage, path);
+        return new ResponseEntity<>(new ApiError(status, Collections.singletonList(errorMessage),
+                getMessageForStatus(status), path), status);
     }
 
     private String getMessageForStatus(HttpStatus status) {
         switch (status) {
-            case UNAUTHORIZED:
-                return "Access Denied";
             case BAD_REQUEST:
                 return "Invalid Request";
+            case INTERNAL_SERVER_ERROR:
+                return "Unexpected Error";
             default:
                 return status.getReasonPhrase();
         }

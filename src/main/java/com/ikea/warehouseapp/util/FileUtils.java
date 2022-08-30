@@ -1,12 +1,20 @@
 package com.ikea.warehouseapp.util;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class FileUtils {
 
-    public static boolean isValidJsonFilePath(String filepath) {
+    public static File getJsonFile(String filepath) throws FileNotFoundException {
         // TODO - Test file path in Linux/Unix
-        return Files.exists(Paths.get(filepath)) && filepath.endsWith(".json");
+        File file = new File(filepath);
+        String fileName = file.getName();
+        if (!file.exists()) {
+            throw new FileNotFoundException("File " + fileName + " does not exist");
+        }
+        if (!filepath.endsWith(".json")) {
+            throw new FileNotFoundException("File " + fileName + " is not a JSON file");
+        }
+        return file;
     }
 }
