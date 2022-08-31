@@ -1,6 +1,6 @@
 package com.ikea.warehouseapp.service.command;
 
-import com.ikea.warehouseapp.data.dao.ProductRepository;
+import com.ikea.warehouseapp.data.repository.ProductRepository;
 import com.ikea.warehouseapp.data.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

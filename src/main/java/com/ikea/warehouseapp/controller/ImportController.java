@@ -72,7 +72,7 @@ public class ImportController {
             throw new ResourceNotFoundException("Import product article ids " + notExistArticleIds + " not exists");
         }
         final List<Product> importedProducts = productCommandService.saveAllProducts(products);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ProductMapper.INSTANCE.toDtoList(importedProducts));
+        return new ResponseEntity<>(ProductMapper.INSTANCE.toDtoList(importedProducts), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Import articles")
@@ -90,7 +90,7 @@ public class ImportController {
             throw new ResourceExistsException("Import articles ids " + getArticleIds(existingArticles) + " already exists");
         }
         final List<Article> importedArticles = articleCommandService.saveAllArticles(articles);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ArticleMapper.INSTANCE.toDtoList(importedArticles));
+        return new ResponseEntity<>(ArticleMapper.INSTANCE.toDtoList(importedArticles), HttpStatus.CREATED);
     }
 
     private List<String> getProductNames(List<Product> products) {

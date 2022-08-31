@@ -1,6 +1,6 @@
 package com.ikea.warehouseapp.service.impl;
 
-import com.ikea.warehouseapp.data.dao.ArticleRepository;
+import com.ikea.warehouseapp.data.repository.ArticleRepository;
 import com.ikea.warehouseapp.data.dto.ArticleDto;
 import com.ikea.warehouseapp.data.dto.ArticleIncomingDto;
 import com.ikea.warehouseapp.data.model.Article;

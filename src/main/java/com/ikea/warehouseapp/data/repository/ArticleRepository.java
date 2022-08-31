@@ -1,4 +1,4 @@
-package com.ikea.warehouseapp.data.dao;
+package com.ikea.warehouseapp.data.repository;
 
 import com.ikea.warehouseapp.data.model.Article;
 import org.springframework.data.jpa.repository.JpaRepository;

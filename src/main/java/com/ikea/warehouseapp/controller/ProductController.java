@@ -1,13 +1,13 @@
 package com.ikea.warehouseapp.controller;
 
+import com.ikea.warehouseapp.data.Page;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
+import com.ikea.warehouseapp.data.dto.ProductPageDto;
 import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
 import com.ikea.warehouseapp.data.model.Product;
 import com.ikea.warehouseapp.service.ProductService;
-import com.ikea.warehouseapp.service.command.ProductCommandService;
-import com.ikea.warehouseapp.service.query.ArticleQueryService;
 import com.ikea.warehouseapp.service.query.ProductQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -45,18 +46,19 @@ public class ProductController {
 
     private ProductQueryService productQueryService;
 
-    private ProductCommandService productCommandService;
-
-    private ArticleQueryService articleQueryService;
-
     @Operation(summary = "Get all products and quantity of each that is an available with the current inventory")
     @ApiResponse(responseCode = "200", description = "Available products were returned", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = AvailableProductDto.class)))
     })
     @GetMapping("available")
-    public ResponseEntity<List<AvailableProductDto>> getAvailableProducts() {
+    public ResponseEntity<ProductPageDto<AvailableProductDto>> getAvailableProducts(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "20") int limit
+//            @RequestParam(required = false, name = "sortField", defaultValue = "createdAt") String sortField,
+//            @RequestParam(required = false, name = "direction", defaultValue = "DESC") String direction
+    ) {
         // TODO - Add fetch big data support, add pagination
-        return ResponseEntity.status(HttpStatus.OK).body(productService.getAvailableProducts());
+        return ResponseEntity.ok(productQueryService.findAvailableProducts(new Page(offset, limit)));
     }
 
     @Operation(summary = "Purchase a product and update the inventory accordingly")
@@ -69,7 +71,7 @@ public class ProductController {
     @PutMapping("{productName}")
     public ResponseEntity<AvailableProductDto> purchaseProduct(@PathVariable("productName") String name) {
         // TODO - Change the path variable to ID
-        final Optional<Product> optionalProduct = productService.getProductByName(name);
+        /*final Optional<Product> optionalProduct = productService.getProductByName(name);
         if (optionalProduct.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -81,7 +83,8 @@ public class ProductController {
         }
         productService.purchaseProduct(optionalProduct.get());
         AvailableProductDto availableProductDto = new AvailableProductDto(name, availableInventory - 1);
-        return ResponseEntity.status(HttpStatus.OK).body(availableProductDto);
+        return ResponseEntity.status(HttpStatus.OK).body(availableProductDto);*/
+        return null;
     }
 
     @Operation(summary = "Add new product")

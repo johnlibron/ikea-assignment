@@ -15,6 +15,7 @@
 	<description>IKEA Warehouse Software</description>
 	<properties>
 		<java.version>11</java.version>
+		<org.mybatis.spring.boot.version>2.2.2</org.mybatis.spring.boot.version>
 		<io.springfox.version>3.0.0</io.springfox.version>
 		<org.projectlombok.version>1.18.24</org.projectlombok.version>
 		<org.projectlombok.lombok.mapstruct.binding.version>0.2.0</org.projectlombok.lombok.mapstruct.binding.version>
@@ -33,6 +34,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>${org.mybatis.spring.boot.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.springfox</groupId>

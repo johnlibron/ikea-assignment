@@ -1,7 +1,7 @@
 package com.ikea.warehouseapp.service.impl;
 
-import com.ikea.warehouseapp.data.dao.ArticleRepository;
-import com.ikea.warehouseapp.data.dao.ProductRepository;
+import com.ikea.warehouseapp.data.repository.ArticleRepository;
+import com.ikea.warehouseapp.data.repository.ProductRepository;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
 import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
@@ -37,14 +37,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<AvailableProductDto> getAvailableProducts() {
         // TODO - Minimize db transactions, check db caching, use hashmap
-        List<AvailableProductDto> availableProducts = new ArrayList<>();
+        /*List<AvailableProductDto> availableProducts = new ArrayList<>();
         productRepository.findAll().forEach(product -> {
             long quantity = getAvailableInventory(product.getArticles());
             if (quantity > 0) {
                  availableProducts.add(new AvailableProductDto(product.getName(), quantity));
             }
         });
-        return availableProducts;
+        return availableProducts;*/
+        return null;
     }
 
     @Override
