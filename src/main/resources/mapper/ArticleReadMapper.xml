@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ikea.warehouseapp.data.mybatis.ArticleReadMapper">
+    <sql id="tableJoinCondition">
+        from product P
+        left join product_articles PA on P.id = PA.product_id
+        left join article A on A.article_id = PA.article_id
+    </sql>
+    <sql id="productArticleIds">
+        <foreach collection="products" item="product" separator=",">
+            <foreach collection="product.articles" item="article" separator=",">
+                '${article.articleId}'
+            </foreach>
+        </foreach>
+    </sql>
+    <sql id="articleIds">
+        <foreach collection="articles" item="article" separator=",">
+            '${article.articleId}'
+        </foreach>
+    </sql>
+    <sql id="findArticlesByIn">
+        select distinct A.article_id
+        <include refid="tableJoinCondition"/>
+        where A.article_id in
+    </sql>
+    <select id="findExistingArticles" resultType="java.lang.String">
+        <include refid="findArticlesByIn"/> (<include refid="articleIds"/>)
+    </select>
+    <select id="findNotExistingProductArticles" resultType="java.lang.String">
+        select unnest(array[<include refid="productArticleIds"/>])
+        except
+        <include refid="findArticlesByIn"/> (<include refid="productArticleIds"/>)
+    </select>
+</mapper>

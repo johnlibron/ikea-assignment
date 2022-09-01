@@ -1,7 +1,8 @@
 package com.ikea.warehouseapp.service.query;
 
-import com.ikea.warehouseapp.data.repository.ArticleRepository;
 import com.ikea.warehouseapp.data.model.Article;
+import com.ikea.warehouseapp.data.model.Product;
+import com.ikea.warehouseapp.data.mybatis.ArticleReadMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +12,13 @@ import java.util.List;
 @AllArgsConstructor
 public class ArticleQueryService {
 
-    private ArticleRepository articleRepository;
+    private ArticleReadMapper articleReadMapper;
 
-    public List<Article> findByArticleIdIn(List<String> articleIds) {
-        return articleRepository.findByArticleIdIn(articleIds);
+    public List<String> findExistingArticles(List<Article> articles) {
+        return articleReadMapper.findExistingArticles(articles);
+    }
+
+    public List<String> findNotExistingProductArticles(List<Product> products) {
+        return articleReadMapper.findNotExistingProductArticles(products);
     }
 }

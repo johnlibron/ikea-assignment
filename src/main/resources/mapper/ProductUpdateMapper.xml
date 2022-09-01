@@ -7,20 +7,19 @@
         left join article A on A.article_id = PA.article_id
     </sql>
     <update id="updateProductAvailableStock">
-        UPDATE article A
-        SET stock = stock - amount_of
+        update article A
+        set stock = stock - amount_of
         from (
             select
-                A.article_id,
-                PA.amount_of,
-                min(A.stock / PA.amount_of) quantity
+            A.article_id,
+            PA.amount_of,
+            min(A.stock / PA.amount_of) quantity
             <include refid="tableJoinCondition"/>
             where P.id = #{id}
-            group by
-                A.article_id, PA.amount_of
+            group by A.article_id, PA.amount_of
         ) PQ
-        WHERE
-            A.article_id = PQ.article_id and
-            PQ.quantity > 0
+        where
+        A.article_id = PQ.article_id and
+        PQ.quantity > 0
     </update>
 </mapper>

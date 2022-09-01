@@ -1,7 +1,6 @@
 package com.ikea.warehouseapp.controller;
 
 import com.ikea.warehouseapp.data.dto.ArticleDto;
-import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.json.Articles;
 import com.ikea.warehouseapp.data.json.Products;
@@ -23,7 +22,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.AllArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,13 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/imports")
@@ -59,17 +52,14 @@ public class ImportController {
     @PostMapping("products")
     public ResponseEntity<List<ProductDto>> importProducts(@RequestParam("path") String path) throws IOException {
         // TODO: Add batch insert support, check deadlock scenario, and add logs, path validation
-        File jsonFile = FileUtils.getJsonFile(path);
-        List<Product> products = JsonMapperUtils.toObject(jsonFile, Products.class).getProducts();
-        List<Product> existingProducts = productQueryService.findByNameIn(getProductNames(products));
+        List<Product> products = JsonMapperUtils.toObject(FileUtils.getJsonFile(path), Products.class).getProducts();
+        List<String> existingProducts = productQueryService.findExistingProducts(products);
         if (!existingProducts.isEmpty()) {
-            throw new ResourceExistsException("Import products " + getProductNames(existingProducts) + " already exists");
+            throw new ResourceExistsException("Import products " + existingProducts + " already exists");
         }
-        List<String> articleIds = new ArrayList<>(getProductArticleIds(products));
-        List<Article> existingArticles = articleQueryService.findByArticleIdIn(articleIds);
-        Collection<String> notExistArticleIds = CollectionUtils.removeAll(articleIds, getArticleIds(existingArticles));
-        if (!notExistArticleIds.isEmpty()) {
-            throw new ResourceNotFoundException("Import product article ids " + notExistArticleIds + " not exists");
+        List<String> notExistingProductArticles = articleQueryService.findNotExistingProductArticles(products);
+        if (!notExistingProductArticles.isEmpty()) {
+            throw new ResourceNotFoundException("Import product article ids " + notExistingProductArticles + " not exists");
         }
         final List<Product> importedProducts = productCommandService.saveAllProducts(products);
         return new ResponseEntity<>(ProductMapper.INSTANCE.toDtoList(importedProducts), HttpStatus.CREATED);
@@ -84,25 +74,11 @@ public class ImportController {
         // TODO: Add batch insert support, check deadlock scenario, and add logs, path validation
         // TODO: If update stocks if import article (id and name) has existing data
         List<Article> articles = JsonMapperUtils.toObject(FileUtils.getJsonFile(path), Articles.class).getArticles();
-        List<String> articleIds = new ArrayList<>(getArticleIds(articles));
-        List<Article> existingArticles = articleQueryService.findByArticleIdIn(articleIds);
+        List<String> existingArticles = articleQueryService.findExistingArticles(articles);
         if (!existingArticles.isEmpty()) {
-            throw new ResourceExistsException("Import articles ids " + getArticleIds(existingArticles) + " already exists");
+            throw new ResourceExistsException("Import articles ids " + existingArticles + " already exists");
         }
         final List<Article> importedArticles = articleCommandService.saveAllArticles(articles);
         return new ResponseEntity<>(ArticleMapper.INSTANCE.toDtoList(importedArticles), HttpStatus.CREATED);
-    }
-
-    private List<String> getProductNames(List<Product> products) {
-        return products.stream().map(Product::getName).collect(Collectors.toList());
-    }
-
-    private Set<String> getProductArticleIds(List<Product> products) {
-        return products.stream().flatMap(product -> product.getArticles().stream())
-                .map(ProductArticleDto::getArticleId).collect(Collectors.toSet());
-    }
-
-    private List<String> getArticleIds(List<Article> articles) {
-        return articles.stream().map(Article::getArticleId).collect(Collectors.toList());
     }
 }

@@ -7,10 +7,6 @@
         P.name productName,
         P.price productPrice
     </sql>
-    <sql id="selectProductWithQuantity">
-        <include refid="selectProduct"/>,
-        min(A.stock / PA.amount_of) quantity
-    </sql>
     <sql id="tableJoinCondition">
         from product P
         left join product_articles PA on P.id = PA.product_id
@@ -20,27 +16,34 @@
         group by P.id, P.name
     </sql>
     <sql id="findProductsWithQuantity">
-        <include refid="selectProductWithQuantity"/>
+        <include refid="selectProduct"/>
+        , min(A.stock / PA.amount_of) quantity
         <include refid="tableJoinCondition"/>
         <include refid="groupByProduct"/>
     </sql>
+    <select id="findExistingProducts" resultType="java.lang.String">
+        select P.name
+        from product P
+        where P.name in
+        <foreach collection="products" item="product" open="(" separator="," close=")">
+            '${product.name}'
+        </foreach>
+    </select>
     <select id="findAvailableProducts" resultMap="availableProduct">
         select *
         from (<include refid="findProductsWithQuantity"/>) PQ
-        where
-        PQ.quantity > 0
+        where PQ.quantity > 0
         offset #{page.offset}
         limit #{page.limit}
     </select>
     <select id="countAvailableProducts" resultType="java.lang.Long">
-        select
-        count(distinct PQ.productId)
+        select count(distinct PQ.productId)
         from (<include refid="findProductsWithQuantity"/>) PQ
-        where
-        PQ.quantity > 0
+        where PQ.quantity > 0
     </select>
     <select id="findProductAvailableStock" resultMap="availableProduct">
-        <include refid="selectProductWithQuantity"/>
+        <include refid="selectProduct"/>
+        , min(A.stock / PA.amount_of) quantity
         <include refid="tableJoinCondition"/>
         where P.id = #{id}
         <include refid="groupByProduct"/>

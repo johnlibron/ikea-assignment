@@ -123,7 +123,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         final String localizedMessage = exception.getLocalizedMessage();
         final String path = ((ServletWebRequest) request).getRequest().getRequestURI();
         String message = StringUtils.isNotEmpty(localizedMessage) ? localizedMessage : status.getReasonPhrase();
-        logger.error(String.format("message: %s %n requested uri: %s", message, path), exception);
+        logger.error(String.format("message: %s, requested uri: %s", message, path), exception);
         return getExceptionResponseEntity(status, request, message);
     }
 

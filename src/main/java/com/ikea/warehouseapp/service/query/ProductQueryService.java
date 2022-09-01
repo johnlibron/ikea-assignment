@@ -5,7 +5,6 @@ import com.ikea.warehouseapp.data.dto.AvailableProductDto;
 import com.ikea.warehouseapp.data.dto.ProductPageDto;
 import com.ikea.warehouseapp.data.model.Product;
 import com.ikea.warehouseapp.data.mybatis.ProductReadMapper;
-import com.ikea.warehouseapp.data.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +16,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProductQueryService {
 
-    private ProductRepository productRepository;
-
     private ProductReadMapper productReadMapper;
 
-    public List<Product> findByNameIn(List<String> productNames) {
-        return productRepository.findByNameIn(productNames);
+    public List<String> findExistingProducts(List<Product> products) {
+        return productReadMapper.findExistingProducts(products);
     }
 
     public ProductPageDto<AvailableProductDto> findAvailableProducts(Page page) {
