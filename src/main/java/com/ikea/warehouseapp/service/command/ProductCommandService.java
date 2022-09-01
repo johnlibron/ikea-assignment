@@ -1,5 +1,6 @@
 package com.ikea.warehouseapp.service.command;
 
+import com.ikea.warehouseapp.data.mybatis.ProductUpdateMapper;
 import com.ikea.warehouseapp.data.repository.ProductRepository;
 import com.ikea.warehouseapp.data.model.Product;
 import lombok.AllArgsConstructor;
@@ -20,9 +21,15 @@ public class ProductCommandService {
 
     private ProductRepository productRepository;
 
+    private ProductUpdateMapper productUpdateMapper;
+
     public List<Product> saveAllProducts(List<Product> products) {
         final List<Product> createdProducts = productRepository.saveAll(products);
         log.info(NEW_PRODUCTS_LOG, createdProducts.stream().map(Product::getId).collect(Collectors.toList()));
         return createdProducts;
+    }
+
+    public void purchaseProduct(Long id) {
+        productUpdateMapper.updateProductAvailableStock(id);
     }
 }

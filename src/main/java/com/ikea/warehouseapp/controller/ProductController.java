@@ -2,12 +2,15 @@ package com.ikea.warehouseapp.controller;
 
 import com.ikea.warehouseapp.data.Page;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
-import com.ikea.warehouseapp.data.dto.ProductPageDto;
 import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
+import com.ikea.warehouseapp.data.dto.ProductPageDto;
 import com.ikea.warehouseapp.data.model.Product;
+import com.ikea.warehouseapp.exception.InsufficientStockException;
+import com.ikea.warehouseapp.exception.ResourceNotFoundException;
 import com.ikea.warehouseapp.service.ProductService;
+import com.ikea.warehouseapp.service.command.ProductCommandService;
 import com.ikea.warehouseapp.service.query.ProductQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -46,6 +49,8 @@ public class ProductController {
 
     private ProductQueryService productQueryService;
 
+    private ProductCommandService productCommandService;
+
     @Operation(summary = "Get all products and quantity of each that is an available with the current inventory")
     @ApiResponse(responseCode = "200", description = "Available products were returned", content = {
         @Content(array = @ArraySchema(schema = @Schema(implementation = AvailableProductDto.class)))
@@ -53,38 +58,30 @@ public class ProductController {
     @GetMapping("available")
     public ResponseEntity<ProductPageDto<AvailableProductDto>> getAvailableProducts(
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "limit", defaultValue = "20") int limit
-//            @RequestParam(required = false, name = "sortField", defaultValue = "createdAt") String sortField,
-//            @RequestParam(required = false, name = "direction", defaultValue = "DESC") String direction
-    ) {
-        // TODO - Add fetch big data support, add pagination
+            @RequestParam(value = "limit", defaultValue = "20") int limit,
+            @RequestParam(value = "sortField", defaultValue = "createdAt") String sortField,
+            @RequestParam(value = "direction", defaultValue = "desc") String direction) {
+        // TODO - Add fetch big data support
         return ResponseEntity.ok(productQueryService.findAvailableProducts(new Page(offset, limit)));
     }
 
     @Operation(summary = "Purchase a product and update the inventory accordingly")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product was purchased and Inventory was updated",
+        @ApiResponse(responseCode = "200", description = "Product was purchased",
             content = {@Content(schema = @Schema(implementation = AvailableProductDto.class))}),
-        @ApiResponse(responseCode = "404", description = "Product/Inventory not found", content = @Content),
-        @ApiResponse(responseCode = "409", description = "Insufficient inventory", content = @Content)
+        @ApiResponse(responseCode = "404", description = "Product not found", content = @Content),
+        @ApiResponse(responseCode = "409", description = "Insufficient stock", content = @Content)
     })
-    @PutMapping("{productName}")
-    public ResponseEntity<AvailableProductDto> purchaseProduct(@PathVariable("productName") String name) {
-        // TODO - Change the path variable to ID
-        /*final Optional<Product> optionalProduct = productService.getProductByName(name);
-        if (optionalProduct.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    @PutMapping("{id}")
+    public ResponseEntity<AvailableProductDto> purchaseProduct(@PathVariable("id") Long id) {
+        AvailableProductDto availableProduct = productQueryService.findProductAvailableStock(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not exists"));
+        if (availableProduct.getQuantity() == 0) {
+            throw new InsufficientStockException("Insufficient stock for " + availableProduct.getName());
         }
-        final Long availableInventory = productService.getAvailableInventory(optionalProduct.get().getArticles());
-        if (availableInventory == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } else if (availableInventory == 0) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        productService.purchaseProduct(optionalProduct.get());
-        AvailableProductDto availableProductDto = new AvailableProductDto(name, availableInventory - 1);
-        return ResponseEntity.status(HttpStatus.OK).body(availableProductDto);*/
-        return null;
+        productCommandService.purchaseProduct(id);
+        availableProduct.setQuantity(availableProduct.getQuantity()-1);
+        return ResponseEntity.ok(availableProduct);
     }
 
     @Operation(summary = "Add new product")

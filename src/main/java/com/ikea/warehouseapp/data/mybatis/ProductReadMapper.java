@@ -8,9 +8,11 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 @Mapper
-public interface ProductReadService {
+public interface ProductReadMapper {
 
     List<AvailableProductDto> findAvailableProducts(@Param("page") Page page);
 
     long countAvailableProducts();
+
+    AvailableProductDto findProductAvailableStock(@Param("id") Long id);
 }

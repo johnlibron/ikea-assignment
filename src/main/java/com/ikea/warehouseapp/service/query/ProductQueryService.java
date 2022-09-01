@@ -4,13 +4,14 @@ import com.ikea.warehouseapp.data.Page;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
 import com.ikea.warehouseapp.data.dto.ProductPageDto;
 import com.ikea.warehouseapp.data.model.Product;
-import com.ikea.warehouseapp.data.mybatis.ProductReadService;
+import com.ikea.warehouseapp.data.mybatis.ProductReadMapper;
 import com.ikea.warehouseapp.data.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -18,7 +19,7 @@ public class ProductQueryService {
 
     private ProductRepository productRepository;
 
-    private ProductReadService productReadService;
+    private ProductReadMapper productReadMapper;
 
     public List<Product> findByNameIn(List<String> productNames) {
         return productRepository.findByNameIn(productNames);
@@ -26,35 +27,24 @@ public class ProductQueryService {
 
     public ProductPageDto<AvailableProductDto> findAvailableProducts(Page page) {
         // TODO: Minimize db transactions, check db caching, use hashmap
-        long count = productReadService.countAvailableProducts();
+        // TODO: Add page, size, totalPages, sort for ProductPageDto, try use Cursor
+        // TODO: Check if Mybatis mapper can support SelectStatementProvider with java code
+        // https://stackoverflow.com/questions/17511313/how-to-do-pagination-with-mybatis
+        // https://www.javaguides.net/2021/10/spring-boot-pagination-and-sorting-rest-api.html
+        // Pageable pageWithTenElements = PageRequest.of(pageNumber-1,10);
+        long count = productReadMapper.countAvailableProducts();
         if (count <= 0) {
             return new ProductPageDto<>(new ArrayList<>(), count);
         }
-        List<AvailableProductDto> availableProducts = productReadService.findAvailableProducts(page);
+        List<AvailableProductDto> availableProducts = productReadMapper.findAvailableProducts(page);
         return new ProductPageDto<>(availableProducts, count);
     }
 
-    /*public Long getAvailableInventory(List<ProductArticleDto> articles) {
-        List<Article> articleList = articleRepository.findAll();
-        long minQuantity = 0;
-        for (ProductArticleDto article : articles) {
-            Optional<Long> optionalStock = articleList.stream()
-                    .filter(e -> e.getArticleId().equals(article.getArticleId()))
-                    .findFirst().map(Article::getStock);
-            if (optionalStock.isEmpty()) {
-                return null;
-            }
-            if (optionalStock.get() < article.getAmountOf()) {
-                minQuantity = 0;
-                break;
-            }
-            long quantityNeeded = optionalStock.get() / article.getAmountOf();
-            if (minQuantity == 0) {
-                minQuantity = quantityNeeded;
-            } else {
-                minQuantity = Math.min(minQuantity, quantityNeeded);
-            }
+    public Optional<AvailableProductDto> findProductAvailableStock(Long id) {
+        AvailableProductDto availableProduct = productReadMapper.findProductAvailableStock(id);
+        if (availableProduct == null) {
+            return Optional.empty();
         }
-        return minQuantity;
-    }*/
+        return Optional.of(availableProduct);
+    }
 }

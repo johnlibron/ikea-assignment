@@ -1,13 +1,12 @@
 package com.ikea.warehouseapp.service.impl;
 
-import com.ikea.warehouseapp.data.repository.ArticleRepository;
-import com.ikea.warehouseapp.data.repository.ProductRepository;
-import com.ikea.warehouseapp.data.dto.AvailableProductDto;
 import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
 import com.ikea.warehouseapp.data.model.Article;
 import com.ikea.warehouseapp.data.model.Product;
+import com.ikea.warehouseapp.data.repository.ArticleRepository;
+import com.ikea.warehouseapp.data.repository.ProductRepository;
 import com.ikea.warehouseapp.service.InventoryService;
 import com.ikea.warehouseapp.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -35,63 +34,8 @@ public class ProductServiceImpl implements ProductService {
     private final ArticleRepository articleRepository;
 
     @Override
-    public List<AvailableProductDto> getAvailableProducts() {
-        // TODO - Minimize db transactions, check db caching, use hashmap
-        /*List<AvailableProductDto> availableProducts = new ArrayList<>();
-        productRepository.findAll().forEach(product -> {
-            long quantity = getAvailableInventory(product.getArticles());
-            if (quantity > 0) {
-                 availableProducts.add(new AvailableProductDto(product.getName(), quantity));
-            }
-        });
-        return availableProducts;*/
-        return null;
-    }
-
-    @Override
-    public Long getAvailableInventory(List<ProductArticleDto> articles) {
-        List<Article> articleList = articleRepository.findAll();
-        long minQuantity = 0;
-        for (ProductArticleDto article : articles) {
-            Optional<Long> optionalStock = articleList.stream()
-                    .filter(e -> e.getArticleId().equals(article.getArticleId()))
-                    .findFirst().map(Article::getStock);
-            if (optionalStock.isEmpty()) {
-                return null;
-            }
-            if (optionalStock.get() < article.getAmountOf()) {
-                minQuantity = 0;
-                break;
-            }
-            long quantityNeeded = optionalStock.get() / article.getAmountOf();
-            if (minQuantity == 0) {
-                minQuantity = quantityNeeded;
-            } else {
-                minQuantity = Math.min(minQuantity, quantityNeeded);
-            }
-        }
-        return minQuantity;
-    }
-
-    @Override
     public Optional<Product> getProductByName(String name) {
         return productRepository.findByName(name);
-    }
-
-    @Override
-    public void purchaseProduct(Product product) {
-        List<Integer> inventoryIds = new ArrayList<>();
-        List<Article> inventories = new ArrayList<>();
-        for (ProductArticleDto article : product.getArticles()) {
-            Optional<Article> optionalInventory = articleRepository.findByArticleId(article.getArticleId());
-            optionalInventory.ifPresent(inventory -> {
-                inventory.setStock(inventory.getStock() - article.getAmountOf());
-                articleRepository.save(inventory);
-            });
-        }
-//        throw new UserNotFoundException("User not found");
-        // employeeRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User by id " + id + " was not found"));
-        log.info(INVENTORY_UPDATED_LOG, inventoryIds);
     }
 
     @Override

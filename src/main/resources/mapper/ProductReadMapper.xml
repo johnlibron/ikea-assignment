@@ -1,38 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ikea.warehouseapp.data.mybatis.ProductReadService">
+<mapper namespace="com.ikea.warehouseapp.data.mybatis.ProductReadMapper">
     <sql id="selectProduct">
         select
         P.id productId,
         P.name productName,
         P.price productPrice
     </sql>
+    <sql id="selectProductWithQuantity">
+        <include refid="selectProduct"/>,
+        min(A.stock / PA.amount_of) quantity
+    </sql>
     <sql id="tableJoinCondition">
         from product P
         left join product_articles PA on P.id = PA.product_id
         left join article A on A.article_id = PA.article_id
     </sql>
-    <sql id="searchCondition_availableProducts">
-        where
-        A.stock >= PA.amount_of
+    <sql id="groupByProduct">
+        group by P.id, P.name
+    </sql>
+    <sql id="findProductsWithQuantity">
+        <include refid="selectProductWithQuantity"/>
+        <include refid="tableJoinCondition"/>
+        <include refid="groupByProduct"/>
     </sql>
     <select id="findAvailableProducts" resultMap="availableProduct">
-        <include refid="selectProduct"/>,
-        min(A.stock / PA.amount_of) quantity
-        <include refid="tableJoinCondition"/>
-        <include refid="searchCondition_availableProducts"/>
-        group by
-        P.id, P.name
+        select *
+        from (<include refid="findProductsWithQuantity"/>) PQ
+        where
+        PQ.quantity > 0
         offset #{page.offset}
         limit #{page.limit}
     </select>
     <select id="countAvailableProducts" resultType="java.lang.Long">
         select
-        count(distinct P.id)
+        count(distinct PQ.productId)
+        from (<include refid="findProductsWithQuantity"/>) PQ
+        where
+        PQ.quantity > 0
+    </select>
+    <select id="findProductAvailableStock" resultMap="availableProduct">
+        <include refid="selectProductWithQuantity"/>
         <include refid="tableJoinCondition"/>
-        <include refid="searchCondition_availableProducts"/>
+        where P.id = #{id}
+        <include refid="groupByProduct"/>
     </select>
     <resultMap id="availableProduct" type="com.ikea.warehouseapp.data.dto.AvailableProductDto">
+        <!--<id column="productId" property="id"/>-->
         <result column="productName" property="name"/>
         <result column="productPrice" property="price"/>
         <result column="quantity" property="quantity"/>
