@@ -2,14 +2,16 @@ package com.ikea.warehouseapp.controller;
 
 import com.ikea.warehouseapp.data.Page;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
+import com.ikea.warehouseapp.data.dto.NewProductDto;
 import com.ikea.warehouseapp.data.dto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
-import com.ikea.warehouseapp.data.dto.ProductIncomingDto;
 import com.ikea.warehouseapp.data.dto.ProductPageDto;
-import com.ikea.warehouseapp.data.model.Product;
+import com.ikea.warehouseapp.data.mapper.ProductMapper;
+import com.ikea.warehouseapp.data.mybatis.ArticleReadMapper;
+import com.ikea.warehouseapp.data.repository.ProductRepository;
 import com.ikea.warehouseapp.exception.InsufficientStockException;
+import com.ikea.warehouseapp.exception.ResourceExistsException;
 import com.ikea.warehouseapp.exception.ResourceNotFoundException;
-import com.ikea.warehouseapp.service.ProductService;
 import com.ikea.warehouseapp.service.command.ProductCommandService;
 import com.ikea.warehouseapp.service.query.ProductQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -45,7 +47,9 @@ public class ProductController {
 
     private static final String NEW_PRODUCT_LOG = "New product was created: {}";
 
-    private final ProductService productService;
+    private ArticleReadMapper articleReadMapper;
+
+    private ProductRepository productRepository;
 
     private ProductQueryService productQueryService;
 
@@ -92,21 +96,18 @@ public class ProductController {
         @ApiResponse(responseCode = "409", description = "Product already exists", content = @Content)
     })
     @PostMapping
-    public ResponseEntity<ProductDto> addProduct(@Valid @RequestBody ProductIncomingDto productIncomingDto) {
-        final Optional<Product> optionalProduct = productService.getProductByName(productIncomingDto.getName());
-        if (optionalProduct.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    public ResponseEntity<ProductDto> addProduct(@Valid @RequestBody NewProductDto newProductDto) {
+        // TODO: Check duplicate in articles
+        productRepository.findByName(newProductDto.getName()).ifPresent(product -> {
+            throw new ResourceExistsException("Product " + product.getName() + " already exists");
+        });
+        List<String> articleIds = newProductDto.getArticles().stream()
+                .map(ProductArticleDto::getArticleId).collect(Collectors.toList());
+        List<String> notExistArticles = articleReadMapper.findArticlesByIdNotIn(articleIds);
+        if (!notExistArticles.isEmpty()) {
+            throw new ResourceNotFoundException("Article IDs " + notExistArticles + " not exists");
         }
-        final List<ProductArticleDto> articles = productService.getProductArticles(productIncomingDto);
-        logger.info("articles: " + articles);
-        if (articles == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        final ProductDto addedProduct = productService.addProduct(productIncomingDto);
-        if (addedProduct == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        logger.info(NEW_PRODUCT_LOG, addedProduct);
-        return ResponseEntity.status(HttpStatus.CREATED).body(null);
+        productCommandService.addNewProduct(newProductDto);
+        return new ResponseEntity<>(ProductMapper.INSTANCE.toDto(newProductDto), HttpStatus.CREATED);
     }
 }

@@ -3,7 +3,6 @@ package com.ikea.warehouseapp.service.query;
 import com.ikea.warehouseapp.data.Page;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
 import com.ikea.warehouseapp.data.dto.ProductPageDto;
-import com.ikea.warehouseapp.data.model.Product;
 import com.ikea.warehouseapp.data.mybatis.ProductReadMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,10 +16,6 @@ import java.util.Optional;
 public class ProductQueryService {
 
     private ProductReadMapper productReadMapper;
-
-    public List<String> findExistingProducts(List<Product> products) {
-        return productReadMapper.findExistingProducts(products);
-    }
 
     public ProductPageDto<AvailableProductDto> findAvailableProducts(Page page) {
         // TODO: Minimize db transactions, check db caching, use hashmap

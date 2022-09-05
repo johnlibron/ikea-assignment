@@ -21,12 +21,15 @@
         <include refid="tableJoinCondition"/>
         <include refid="groupByProduct"/>
     </sql>
-    <select id="findExistingProducts" resultType="java.lang.String">
+    <select id="selectNextProductIdSeq" resultType="java.lang.Long">
+        select nextval ('product_id_seq')
+    </select>
+    <select id="findProductsByNameIn" resultType="java.lang.String">
         select P.name
         from product P
         where P.name in
-        <foreach collection="products" item="product" open="(" separator="," close=")">
-            '${product.name}'
+        <foreach collection="productNames" item="name" open="(" separator="," close=")">
+            #{name}
         </foreach>
     </select>
     <select id="findAvailableProducts" resultMap="availableProduct">

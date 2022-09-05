@@ -1,28 +1,24 @@
 package com.ikea.warehouseapp.data.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Data
-@Builder
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
 public class ProductArticleDto {
 
-    @NotEmpty
-    @NotBlank
+    @NotEmpty(message = "can't be empty")
     private String articleId;
 
-    @NotNull
-    @Min(value = 1L, message = "must not be empty")
+    @NotNull(message = "can't be empty")
+    @Min(value = 1L)
     private Long amountOf;
 }

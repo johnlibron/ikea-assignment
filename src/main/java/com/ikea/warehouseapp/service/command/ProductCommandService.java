@@ -1,8 +1,11 @@
 package com.ikea.warehouseapp.service.command;
 
+import com.ikea.warehouseapp.data.dto.NewProductDto;
+import com.ikea.warehouseapp.data.model.Product;
+import com.ikea.warehouseapp.data.mybatis.ProductCreateMapper;
+import com.ikea.warehouseapp.data.mybatis.ProductReadMapper;
 import com.ikea.warehouseapp.data.mybatis.ProductUpdateMapper;
 import com.ikea.warehouseapp.data.repository.ProductRepository;
-import com.ikea.warehouseapp.data.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,10 @@ public class ProductCommandService {
 
     private ProductRepository productRepository;
 
+    private ProductReadMapper productReadMapper;
+
+    private ProductCreateMapper productCreateMapper;
+
     private ProductUpdateMapper productUpdateMapper;
 
     public List<Product> saveAllProducts(List<Product> products) {
@@ -31,5 +38,10 @@ public class ProductCommandService {
 
     public void purchaseProduct(Long id) {
         productUpdateMapper.updateProductAvailableStock(id);
+    }
+
+    public void addNewProduct(NewProductDto newProductDto) {
+        long newProductId = productReadMapper.selectNextProductIdSeq();
+        productCreateMapper.addNewProduct(newProductId, newProductDto);
     }
 }

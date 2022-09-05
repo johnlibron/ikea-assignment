@@ -1,17 +1,17 @@
 package com.ikea.warehouseapp.data.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
 public class AvailableProductDto {
 
     private String name;
     private double price;
     private Long quantity;
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
+    }
 }
