@@ -11,5 +11,5 @@ import java.util.List;
 public interface ArticleMapper {
     ArticleMapper INSTANCE = Mappers.getMapper(ArticleMapper.class);
 
-    List<ArticleDto> toDtoList(List<Article> articles);
+    List<ArticleDto> map(List<Article> articles);
 }

@@ -3,7 +3,7 @@ package com.ikea.warehouseapp.controller;
 import com.ikea.warehouseapp.data.Page;
 import com.ikea.warehouseapp.data.dto.AvailableProductDto;
 import com.ikea.warehouseapp.data.dto.NewProductDto;
-import com.ikea.warehouseapp.data.dto.ProductArticleDto;
+import com.ikea.warehouseapp.data.dto.NewProductDto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.dto.ProductPageDto;
 import com.ikea.warehouseapp.data.mapper.ProductMapper;
@@ -108,6 +108,6 @@ public class ProductController {
             throw new ResourceNotFoundException("Article IDs " + notExistArticles + " not exists");
         }
         productCommandService.addNewProduct(newProductDto);
-        return new ResponseEntity<>(ProductMapper.INSTANCE.toDto(newProductDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(ProductMapper.INSTANCE.map(newProductDto), HttpStatus.CREATED);
     }
 }

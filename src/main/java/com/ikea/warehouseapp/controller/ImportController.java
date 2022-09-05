@@ -1,7 +1,7 @@
 package com.ikea.warehouseapp.controller;
 
 import com.ikea.warehouseapp.data.dto.ArticleDto;
-import com.ikea.warehouseapp.data.dto.ProductArticleDto;
+import com.ikea.warehouseapp.data.dto.NewProductDto.ProductArticleDto;
 import com.ikea.warehouseapp.data.dto.ProductDto;
 import com.ikea.warehouseapp.data.json.Articles;
 import com.ikea.warehouseapp.data.json.Products;
@@ -70,7 +70,7 @@ public class ImportController {
             throw new ResourceNotFoundException("Import product article ids " + notExistArticles + " not exists");
         }
         final List<Product> importedProducts = productCommandService.saveAllProducts(products);
-        return new ResponseEntity<>(ProductMapper.INSTANCE.toDtoList(importedProducts), HttpStatus.CREATED);
+        return new ResponseEntity<>(ProductMapper.INSTANCE.map(importedProducts), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Import articles")
@@ -88,6 +88,6 @@ public class ImportController {
             throw new ResourceExistsException("Import articles ids " + existArticles + " already exists");
         }
         final List<Article> importedArticles = articleCommandService.saveAllArticles(articles);
-        return new ResponseEntity<>(ArticleMapper.INSTANCE.toDtoList(importedArticles), HttpStatus.CREATED);
+        return new ResponseEntity<>(ArticleMapper.INSTANCE.map(importedArticles), HttpStatus.CREATED);
     }
 }

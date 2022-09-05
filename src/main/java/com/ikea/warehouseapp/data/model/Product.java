@@ -1,6 +1,6 @@
 package com.ikea.warehouseapp.data.model;
 
-import com.ikea.warehouseapp.data.dto.ProductArticleDto;
+import com.ikea.warehouseapp.data.dto.NewProductDto.ProductArticleDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

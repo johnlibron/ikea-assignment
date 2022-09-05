@@ -12,7 +12,7 @@ import java.util.List;
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
-    List<ProductDto> toDtoList(List<Product> products);
+    List<ProductDto> map(List<Product> products);
 
-    ProductDto toDto(NewProductDto newProductDto);
+    ProductDto map(NewProductDto newProductDto);
 }
