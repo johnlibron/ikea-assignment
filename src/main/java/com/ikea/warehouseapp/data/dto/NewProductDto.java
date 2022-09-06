@@ -34,7 +34,7 @@ public class NewProductDto {
     @Embeddable
     public static class ProductArticleDto {
 
-        @NotEmpty(message = "can't be empty")
+        @NotBlank(message = "can't be empty")
         private String articleId;
 
         @NotNull(message = "can't be empty")

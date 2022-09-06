@@ -1,9 +1,11 @@
 package com.ikea.warehouseapp.controller;
 
-import com.ikea.warehouseapp.data.repository.ArticleRepository;
 import com.ikea.warehouseapp.data.dto.ArticleDto;
-import com.ikea.warehouseapp.data.dto.ArticleIncomingDto;
-import com.ikea.warehouseapp.service.InventoryService;
+import com.ikea.warehouseapp.data.dto.NewArticleDto;
+import com.ikea.warehouseapp.data.mapper.ArticleMapper;
+import com.ikea.warehouseapp.data.repository.ArticleRepository;
+import com.ikea.warehouseapp.exception.ResourceExistsException;
+import com.ikea.warehouseapp.service.command.ArticleCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,7 +34,7 @@ public class ArticleController {
 
     private final ArticleRepository articleRepository;
 
-    private final InventoryService inventoryService;
+    private ArticleCommandService articleCommandService;
 
     @Operation(summary = "Add new inventory")
     @ApiResponses(value = {
@@ -41,12 +43,14 @@ public class ArticleController {
         @ApiResponse(responseCode = "409", description = "Inventory already exists", content = @Content)
     })
     @PostMapping
-    public ResponseEntity<ArticleDto> addInventory(@Valid @RequestBody ArticleIncomingDto articleIncomingDto) {
-        final ArticleDto addedInventory = inventoryService.addInventory(articleIncomingDto);
-        if (addedInventory == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        logger.info(NEW_INVENTORY_LOG, addedInventory);
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedInventory);
+    public ResponseEntity<ArticleDto> addInventory(@Valid @RequestBody NewArticleDto newArticleDto) {
+        articleRepository.findByArticleId(newArticleDto.getArticleId()).ifPresent(article -> {
+            throw new ResourceExistsException("Article " + article.getArticleId() + " already exists");
+        });
+        articleRepository.findByName(newArticleDto.getName()).ifPresent(article -> {
+            throw new ResourceExistsException("Article name " + article.getName() + " already exists");
+        });
+        articleCommandService.addNewInventory(newArticleDto);
+        return new ResponseEntity<>(ArticleMapper.INSTANCE.toDto(newArticleDto), HttpStatus.CREATED);
     }
 }

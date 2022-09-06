@@ -108,6 +108,6 @@ public class ProductController {
             throw new ResourceNotFoundException("Article IDs " + notExistArticles + " not exists");
         }
         productCommandService.addNewProduct(newProductDto);
-        return new ResponseEntity<>(ProductMapper.INSTANCE.map(newProductDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(ProductMapper.INSTANCE.toDto(newProductDto), HttpStatus.CREATED);
     }
 }

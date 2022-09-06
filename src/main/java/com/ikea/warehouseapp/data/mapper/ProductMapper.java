@@ -8,11 +8,11 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ProductMapper {
     ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
-    List<ProductDto> map(List<Product> products);
+    List<ProductDto> toDtoList(List<Product> products);
 
-    ProductDto map(NewProductDto newProductDto);
+    ProductDto toDto(NewProductDto newProductDto);
 }
